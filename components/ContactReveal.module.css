@@ -1,0 +1,18 @@
+.reveal {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+.email {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-link);
+}
