@@ -1,17 +1,118 @@
+/**
+ * Design tokens.
+ *
+ * The hub hosts two unrelated brands, so tokens are scoped per section rather
+ * than declared once globally. Semantic tokens (--color-accent, --color-text …)
+ * are what components consume; the raw brand palettes below exist only to feed
+ * them, and should not be used directly outside this file.
+ *
+ * Switching sections is a single attribute: `[data-section="habisloth"]`
+ * redefines the semantic layer, so the same markup restyles wholesale.
+ * Team EvL tokens land when that section does.
+ */
+
+/* ── Raw palettes — provenance, not for direct use ────────────────────────── */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Studio Infinite Lives, transcribed from SIL-LOGO.svg. */
+  --sil-teal: #03f0e1; /* the logo's backing circle */
+  --sil-teal-deep: #0c928d; /* its shading */
+  --sil-teal-text: #0b837f; /* darkened to clear AA on white (4.60) */
+  --sil-ink: #514f50; /* darkest neutral in the mark */
+  --sil-grey: #777677; /* darkened from #7f7d7f to clear AA (4.52) */
+  --sil-grey-light: #d0d0cf;
+  --sil-grey-pale: #dbdbdb;
+  --sil-white: #fefcfd;
+
+  /* Habi Sloth, transcribed one-way from sil006/lib/theme/app_theme.dart.
+     This file is a copy, never a source — the app owns these values. */
+  --habi-primary: #f9d061;
+  --habi-on-primary: #6a412d;
+  --habi-secondary: #f2b945;
+  --habi-tertiary: #7f9645;
+  --habi-tertiary-text: #697c39; /* darkened to clear AA on white (4.62) */
+  --habi-surface-dim: #faebb7;
+  --habi-sky: #91e3f9; /* `defaultAppBar` in the app */
+  --habi-heat-low: #e53935;
+  --habi-heat-mid: #ffd600;
+  --habi-heat-high: #43a047;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Semantic layer — the studio shell is the default ─────────────────────── */
+
+:root {
+  --color-bg: #ffffff;
+  --color-surface: var(--sil-white);
+  --color-surface-alt: #f4f4f3; /* derived tint of the grey ramp */
+  --color-border: var(--sil-grey-pale);
+
+  --color-text: var(--sil-ink); /* 8.13 on --color-bg */
+  --color-text-muted: var(--sil-grey); /* 4.52 */
+  --color-link: var(--sil-teal-text); /* 4.60 */
+
+  /* Accents. `--color-accent` is for fills, rules and large type only — it does
+     NOT meet AA as small text. Use --color-link for anything read at body size. */
+  --color-accent: var(--sil-teal-deep);
+  --color-accent-bright: var(--sil-teal);
+  --color-on-accent: #ffffff;
+  /* Text placed on --color-accent-bright must be ink, not white: white on that
+     teal is 1.44 (fails), ink is 5.63. */
+  --color-on-accent-bright: var(--sil-ink);
+
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Spacing and radii, so sections share rhythm even when they don't share hue. */
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1.25rem;
+  --space-lg: 2rem;
+  --space-xl: 3.5rem;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-full: 999px;
+  --measure: 68ch; /* comfortable reading width */
+  --page-max: 72rem;
+}
+
+/* ── Habi Sloth section ───────────────────────────────────────────────────── */
+
+[data-section="habisloth"] {
+  --color-surface: var(--habi-surface-dim);
+  --color-surface-alt: #fdf6e3;
+  --color-border: var(--habi-secondary);
+
+  --color-text: var(--habi-on-primary); /* 8.73 on white */
+  --color-text-muted: #8a6a54;
+  --color-link: var(--habi-tertiary-text); /* 4.62 */
+
+  --color-accent: var(--habi-primary);
+  --color-accent-bright: var(--habi-sky);
+  /* Brown on the yellow primary is 5.91 — the app's own pairing. */
+  --color-on-accent: var(--habi-on-primary);
+  --color-on-accent-bright: var(--habi-on-primary);
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+
+/* Light-only for now: Habi Sloth's palette is inherently a light one, and a
+   credible dark theme for two brands is real work that no plan section covers.
+   Everything above is tokens, so adding it later is a scoped change. */
+:root {
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
   height: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 html,
@@ -24,26 +125,54 @@ body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.02em;
+}
+
+p {
+  max-width: var(--measure);
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+  color: var(--color-link);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+}
+
+/* Respect a user's reduced-motion setting before any animation exists to
+   forget about it — the habit wheel in §4 is the reason this matters. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
