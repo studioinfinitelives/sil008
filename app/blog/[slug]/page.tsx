@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageShell } from "@/components/PageShell";
 
 export const metadata: Metadata = { title: "Post" };
 
@@ -14,5 +15,5 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  return <h1>{slug}</h1>;
+  return <PageShell eyebrow="Infinite Lives" title={slug} lede="Placeholder post." />;
 }
