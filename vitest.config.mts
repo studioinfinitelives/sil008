@@ -1,6 +1,5 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
-import { fileURLToPath } from "node:url";
 
 export default defineConfig({
   plugins: [react()],
@@ -8,10 +7,13 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
-    include: ["**/*.test.{ts,tsx}"],
+    include: ["src/**/*.test.{ts,tsx}"],
     exclude: ["node_modules", ".next", "out"],
   },
   resolve: {
-    alias: { "@": fileURLToPath(new URL("./", import.meta.url)) },
+    // Reads the `@/*` alias straight out of tsconfig.json rather than restating
+    // it here, so the two cannot drift apart. Native since Vite 7 — this
+    // replaces the `vite-tsconfig-paths` plugin.
+    tsconfigPaths: true,
   },
 });
