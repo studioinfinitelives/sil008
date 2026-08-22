@@ -15,5 +15,7 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  return <PageShell eyebrow="Infinite Lives" title={slug} lede="Placeholder post." />;
+  return (
+    <PageShell eyebrow="Infinite Lives" title={slug} lede="Placeholder post." />
+  );
 }

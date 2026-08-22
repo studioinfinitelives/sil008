@@ -149,7 +149,9 @@ describe("computePaceDays", () => {
 
 describe("computeStaticDailyCount", () => {
   test("flat target rounds up over active days", () => {
-    expect(computeStaticDailyCount({ daysOfWeek: [1, 3, 5], goal: 10 })).toBe(4);
+    expect(computeStaticDailyCount({ daysOfWeek: [1, 3, 5], goal: 10 })).toBe(
+      4,
+    );
   });
 
   test("daily schedule divides by 7", () => {

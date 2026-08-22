@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import styles from "./ProjectCard.module.css";
 
 interface ProjectCardProps {
   /** Label under the avatar. Use `\n` for the second line. */
@@ -11,37 +10,40 @@ interface ProjectCardProps {
   href?: string;
 }
 
+const CARD =
+  "flex w-35 flex-col items-center text-subtle no-underline transition-transform duration-200";
+const LINK = "hover:scale-105 hover:text-ink focus-visible:scale-105";
+
 /**
  * One "Our Creations" entry: circular artwork over a two-line label.
  *
- * Cards without an `href` render as plain content rather than a dead link —
- * Team EvL points out to its linktree, Habi Sloth in to its section, and
- * "More Coming Soon" links nowhere on purpose.
+ * Cards without an `href` render as plain content rather than a dead link.
  */
 export function ProjectCard({ name, src, href }: ProjectCardProps) {
   const inner = (
     <>
       <Image
-        className={styles.avatar}
+        className="size-30 rounded-full object-cover"
         src={src}
         alt=""
         width={240}
         height={240}
       />
-      <span className={styles.name}>{name}</span>
+      <span className="mt-4 text-center text-sm leading-snug font-medium whitespace-pre-line">
+        {name}
+      </span>
     </>
   );
 
   if (href === undefined) {
-    return <div className={styles.card}>{inner}</div>;
+    return <div className={CARD}>{inner}</div>;
   }
 
-  const isExternal = href.startsWith("http");
   const label = name.replace("\n", " ");
 
-  return isExternal ? (
+  return href.startsWith("http") ? (
     <a
-      className={styles.card}
+      className={`${CARD} ${LINK}`}
       href={href}
       aria-label={label}
       target="_blank"
@@ -50,7 +52,7 @@ export function ProjectCard({ name, src, href }: ProjectCardProps) {
       {inner}
     </a>
   ) : (
-    <Link className={styles.card} href={href} aria-label={label}>
+    <Link className={`${CARD} ${LINK}`} href={href} aria-label={label}>
       {inner}
     </Link>
   );
