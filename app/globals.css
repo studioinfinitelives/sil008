@@ -1,177 +1,303 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
 /**
  * Design tokens.
  *
- * The hub hosts two unrelated brands, so tokens are scoped per section rather
- * than declared once globally. Semantic tokens (--color-accent, --color-text …)
- * are what components consume; the raw brand palettes below exist only to feed
- * them, and should not be used directly outside this file.
+ * Three layers, in dependency order:
  *
- * Switching sections is a single attribute: `[data-section="habisloth"]`
- * redefines the semantic layer, so the same markup restyles wholesale.
- * Team EvL tokens land when that section does.
+ * 1. **Raw brand palettes** (`--color-sil-*`, `--color-habi-*`) — provenance
+ *    only. Never reference these outside this file.
+ * 2. **Semantic tokens** (`--color-canvas`, `--color-ink`, `--color-brand` …) —
+ *    what components consume, via utilities like `bg-canvas` / `text-ink`.
+ * 3. **shadcn primitives** (`--background`, `--primary`, `--border` …) — mapped
+ *    onto layer 2 so shadcn/ui components inherit the brand automatically
+ *    rather than carrying their own neutral palette.
+ *
+ * Two axes vary independently: **section** (`[data-section="habisloth"]`) and
+ * **theme** (`.dark`, set by next-themes). Because both re-point the same
+ * custom properties, identical markup restyles wholesale — no component needs
+ * to know which brand or theme it is rendering under.
+ *
+ * NOTE ON NAMING: shadcn reserves `accent`, `muted`, `primary`, `secondary`,
+ * `border`, `background`, `foreground`, `card`, `popover`, `ring`, `input`,
+ * `destructive`, `chart-*` and `sidebar-*`. The brand layer deliberately avoids
+ * all of those — hence `brand` rather than `accent`, and `subtle` rather than
+ * `muted`. Reusing a reserved name silently loses, because shadcn's
+ * `@theme inline` block is emitted after this one.
  */
 
-/* ── Raw palettes — provenance, not for direct use ────────────────────────── */
-
-:root {
+@theme {
   /* Studio Infinite Lives, transcribed from SIL-LOGO.svg. */
-  --sil-teal: #03f0e1; /* the logo's backing circle */
-  --sil-teal-deep: #0c928d; /* its shading */
-  --sil-teal-text: #0b837f; /* darkened to clear AA on white (4.60) */
-  --sil-ink: #514f50; /* darkest neutral in the mark */
-  --sil-grey: #777677; /* darkened from #7f7d7f to clear AA (4.52) */
-  --sil-grey-light: #d0d0cf;
-  --sil-grey-pale: #dbdbdb;
-  --sil-white: #fefcfd;
+  --color-sil-teal: #03f0e1; /* the logo's backing circle */
+  --color-sil-teal-deep: #0c928d; /* its shading */
+  --color-sil-teal-text: #0b837f; /* darkened to clear AA on white (4.60) */
+  --color-sil-ink: #514f50; /* darkest neutral in the mark */
+  --color-sil-grey: #777677; /* darkened from #7f7d7f to clear AA (4.52) */
+  --color-sil-grey-pale: #dbdbdb;
 
   /* Habi Sloth, transcribed one-way from sil006/lib/theme/app_theme.dart.
      This file is a copy, never a source — the app owns these values. */
-  --habi-primary: #f9d061;
-  --habi-on-primary: #6a412d;
-  --habi-secondary: #f2b945;
-  --habi-tertiary: #7f9645;
-  --habi-tertiary-text: #697c39; /* darkened to clear AA on white (4.62) */
-  --habi-surface-dim: #faebb7;
-  --habi-sky: #91e3f9; /* `defaultAppBar` in the app */
-  --habi-heat-low: #e53935;
-  --habi-heat-mid: #ffd600;
-  --habi-heat-high: #43a047;
-}
+  --color-habi-primary: #f9d061;
+  --color-habi-on-primary: #6a412d;
+  --color-habi-secondary: #f2b945;
+  --color-habi-tertiary: #7f9645;
+  --color-habi-tertiary-text: #697c39; /* darkened to clear AA (4.62) */
+  --color-habi-surface-dim: #faebb7;
+  --color-habi-sky: #91e3f9; /* `defaultAppBar` in the app */
+  --color-habi-heat-low: #e53935;
+  --color-habi-heat-mid: #ffd600;
+  --color-habi-heat-high: #43a047;
 
-/* ── Semantic layer — the studio shell is the default ─────────────────────── */
+  /* ── Semantic layer — studio, light. Every other combination overrides
+        these same properties below. ─────────────────────────────────────── */
+  --color-canvas: #ffffff;
+  --color-surface: #fefcfd;
+  --color-surface-alt: #f4f4f3;
+  --color-line: var(--color-sil-grey-pale);
 
-:root {
-  --color-bg: #ffffff;
-  --color-surface: var(--sil-white);
-  --color-surface-alt: #f4f4f3; /* derived tint of the grey ramp */
-  --color-border: var(--sil-grey-pale);
+  --color-ink: var(--color-sil-ink); /* 8.13 on canvas */
+  --color-subtle: var(--color-sil-grey); /* 4.52 */
+  --color-link: var(--color-sil-teal-text); /* 4.60 */
 
-  --color-text: var(--sil-ink); /* 8.13 on --color-bg */
-  --color-text-muted: var(--sil-grey); /* 4.52 */
-  --color-link: var(--sil-teal-text); /* 4.60 */
+  /* `brand` is for fills, rules and large type. In light mode it does NOT meet
+     AA as small text — use `link` for anything read at body size. */
+  --color-brand: var(--color-sil-teal-deep);
+  --color-brand-bright: var(--color-sil-teal);
+  --color-on-brand: #ffffff;
+  /* Text on brand-bright must be ink, not white: white on that teal is 1.44
+     (fails), ink is 5.63. */
+  --color-on-brand-bright: var(--color-sil-ink);
 
-  /* Accents. `--color-accent` is for fills, rules and large type only — it does
-     NOT meet AA as small text. Use --color-link for anything read at body size. */
-  --color-accent: var(--sil-teal-deep);
-  --color-accent-bright: var(--sil-teal);
-  --color-on-accent: #ffffff;
-  /* Text placed on --color-accent-bright must be ink, not white: white on that
-     teal is 1.44 (fails), ink is 5.63. */
-  --color-on-accent-bright: var(--sil-ink);
-
-  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-
-  /* Spacing and radii, so sections share rhythm even when they don't share hue. */
-  --space-xs: 0.5rem;
-  --space-sm: 0.75rem;
-  --space-md: 1.25rem;
-  --space-lg: 2rem;
-  --space-xl: 3.5rem;
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-full: 999px;
-  --measure: 68ch; /* comfortable reading width */
-  --page-max: 72rem;
 }
 
-/* ── Habi Sloth section ───────────────────────────────────────────────────── */
-
-[data-section="habisloth"] {
-  --color-surface: var(--habi-surface-dim);
-  --color-surface-alt: #fdf6e3;
-  --color-border: var(--habi-secondary);
-
-  --color-text: var(--habi-on-primary); /* 8.73 on white */
-  --color-text-muted: #8a6a54;
-  --color-link: var(--habi-tertiary-text); /* 4.62 */
-
-  --color-accent: var(--habi-primary);
-  --color-accent-bright: var(--habi-sky);
-  /* Brown on the yellow primary is 5.91 — the app's own pairing. */
-  --color-on-accent: var(--habi-on-primary);
-  --color-on-accent-bright: var(--habi-on-primary);
+/* shadcn's token bridge: maps its utility names onto the CSS variables set in
+   the :root / .dark blocks below. Generated by `shadcn init`. */
+@theme inline {
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* ── Base ─────────────────────────────────────────────────────────────────── */
-
-/* Light-only for now: Habi Sloth's palette is inherently a light one, and a
-   credible dark theme for two brands is real work that no plan section covers.
-   Everything above is tokens, so adding it later is a scoped change. */
+/* shadcn primitives, pointed at the semantic layer rather than its stock
+   neutrals — so a <Button> is brand-coloured, and re-colours per section for
+   free because the semantic tokens do. */
 :root {
-  color-scheme: light;
+  --radius: 0.625rem;
+
+  --background: var(--color-canvas);
+  --foreground: var(--color-ink);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-surface);
+  --popover-foreground: var(--color-ink);
+
+  --primary: var(--color-brand);
+  --primary-foreground: var(--color-on-brand);
+  --secondary: var(--color-surface-alt);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-surface-alt);
+  --muted-foreground: var(--color-subtle);
+  --accent: var(--color-surface-alt);
+  --accent-foreground: var(--color-ink);
+
+  --border: var(--color-line);
+  --input: var(--color-line);
+  --ring: var(--color-link);
+  --destructive: oklch(0.577 0.245 27.325);
+
+  --chart-1: var(--color-brand);
+  --chart-2: var(--color-habi-primary);
+  --chart-3: var(--color-habi-tertiary);
+  --chart-4: var(--color-habi-sky);
+  --chart-5: var(--color-sil-grey);
+
+  --sidebar: var(--color-surface);
+  --sidebar-foreground: var(--color-ink);
+  --sidebar-primary: var(--color-brand);
+  --sidebar-primary-foreground: var(--color-on-brand);
+  --sidebar-accent: var(--color-surface-alt);
+  --sidebar-accent-foreground: var(--color-ink);
+  --sidebar-border: var(--color-line);
+  --sidebar-ring: var(--color-link);
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* ── Studio, dark ─────────────────────────────────────────────────────────
+   Verified: ink 14.67, subtle 7.06, link 12.34 — all AAA on canvas. On dark,
+   the bright teal finally works as text, so `link` uses it directly. */
+.dark {
+  --color-canvas: #16181a;
+  --color-surface: #1e2124;
+  --color-surface-alt: #121415;
+  --color-line: #33383c;
+
+  --color-ink: #e9e9ea;
+  --color-subtle: #a3a3a4;
+  --color-link: var(--color-sil-teal);
+
+  --color-brand: var(--color-sil-teal);
+  --color-brand-bright: var(--color-sil-teal);
+  --color-on-brand: #16181a;
+  --color-on-brand-bright: #16181a;
+
+  --destructive: oklch(0.704 0.191 22.216);
 }
 
-html {
-  height: 100%;
-  -webkit-text-size-adjust: 100%;
+/* ── Habi Sloth, light ────────────────────────────────────────────────────
+   Re-points the semantic layer only; shadcn's primitives follow via :root. */
+[data-section="habisloth"] {
+  --color-surface: var(--color-habi-surface-dim);
+  --color-surface-alt: #fdf6e3;
+  --color-line: var(--color-habi-secondary);
+
+  --color-ink: var(--color-habi-on-primary); /* 8.73 on white */
+  --color-subtle: #8a6a54;
+  --color-link: var(--color-habi-tertiary-text); /* 4.62 */
+
+  --color-brand: var(--color-habi-primary);
+  --color-brand-bright: var(--color-habi-sky);
+  /* Brown on the yellow primary is 5.91 — the app's own pairing. */
+  --color-on-brand: var(--color-habi-on-primary);
+  --color-on-brand-bright: var(--color-habi-on-primary);
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+/* ── Habi Sloth, dark ─────────────────────────────────────────────────────
+   A warm dark rather than the studio's neutral one, so the section still reads
+   as Habi Sloth. Verified: ink 14.77, subtle 8.17, link 12.22 — all AAA. */
+.dark [data-section="habisloth"] {
+  --color-canvas: #1c1510;
+  --color-surface: #261d15;
+  --color-surface-alt: #150f0b;
+  --color-line: #453423;
+
+  --color-ink: #f6e7c9;
+  --color-subtle: #c3ab8a;
+  --color-link: var(--color-habi-primary);
+
+  --color-brand: var(--color-habi-primary);
+  --color-brand-bright: var(--color-habi-sky);
+  --color-on-brand: #2b1a10; /* 11.31 on the yellow */
+  --color-on-brand-bright: #2b1a10;
 }
 
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  html {
+    height: 100%;
+  }
+
+  body {
+    display: flex;
+    min-height: 100%;
+    max-width: 100vw;
+    flex-direction: column;
+    overflow-x: hidden;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+  }
 }
 
-h1,
-h2,
-h3 {
-  line-height: 1.2;
-  text-wrap: balance;
+/* Range inputs need pseudo-element styling that reads far worse as arbitrary
+   variants than as plain CSS. `accent-color` alone leaves Chrome picking its
+   own unfilled-track colour, which goes near-black on a light surface. */
+@layer components {
+  .range-input {
+    width: 100%;
+    height: 1.25rem;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .range-input::-webkit-slider-runnable-track,
+  .range-input::-moz-range-track {
+    height: 6px;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: var(--color-canvas);
+  }
+
+  .range-input::-webkit-slider-thumb {
+    appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: -0.475rem;
+    border: 2px solid var(--color-ink);
+    border-radius: 999px;
+    background: var(--color-brand);
+  }
+
+  .range-input::-moz-range-thumb {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid var(--color-ink);
+    border-radius: 999px;
+    background: var(--color-brand);
+  }
 }
 
-h1 {
-  font-size: clamp(2rem, 5vw, 3rem);
-  letter-spacing: -0.02em;
-}
-
-p {
-  max-width: var(--measure);
-}
-
-a {
-  color: var(--color-link);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.15em;
-}
-
-a:hover {
-  text-decoration-thickness: 2px;
-}
-
-:focus-visible {
-  outline: 2px solid var(--color-link);
-  outline-offset: 2px;
-}
-
-/* Respect a user's reduced-motion setting before any animation exists to
-   forget about it — the habit wheel in §4 is the reason this matters. */
+/* The habit wheel in §4 is the reason this matters. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }

@@ -2,7 +2,6 @@ import Image from "next/image";
 import { cardArt, logoUrl } from "@/lib/cdn";
 import { ContactReveal } from "@/components/ContactReveal";
 import { ProjectCard } from "@/components/ProjectCard";
-import styles from "./page.module.css";
 
 /**
  * The studio hub.
@@ -14,19 +13,23 @@ import styles from "./page.module.css";
  */
 export default function Page() {
   return (
-    <main className={styles.hub}>
+    <main className="bg-surface-alt flex flex-1 flex-col items-center px-5 py-14 text-center">
       <Image
-        className={styles.logo}
+        className="size-50 rounded-full"
         src={logoUrl}
         alt="Studio Infinite Lives"
         width={200}
         height={200}
         priority
       />
-      <h1 className={styles.wordmark}>Studio Infinite Lives</h1>
+      <h1 className="text-ink mt-8 text-3xl font-black tracking-wide sm:text-4xl">
+        Studio Infinite Lives
+      </h1>
 
-      <h2 className={styles.creations}>Our Creations</h2>
-      <div className={styles.cards}>
+      <h2 className="text-ink mt-20 text-lg font-medium lg:mt-30">
+        Our Creations
+      </h2>
+      <div className="mt-8 flex flex-wrap justify-center gap-8">
         <ProjectCard
           name={"Team EvL\nThe Card Game"}
           src={cardArt.teamevl}
@@ -40,7 +43,7 @@ export default function Page() {
         <ProjectCard name={"More\nComing Soon"} src={cardArt.comingSoon} />
       </div>
 
-      <div className={styles.contact}>
+      <div className="mt-14">
         <ContactReveal />
       </div>
     </main>
