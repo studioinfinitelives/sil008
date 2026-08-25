@@ -59,16 +59,20 @@ export const habiArt = {
 /**
  * Screenshots of the running app.
  *
- * Captured for the site rather than shipped with the app, so these take the
- * `site_` prefix. They are still product art, so the CDN is where they belong
- * (plan §6) — but a file there can never be replaced, so a screenshot is
- * staged in `public/` first and only uploaded once it has been looked at.
+ * Captured for the site rather than shipped with the app, but they are still
+ * product art, so the CDN is where they belong (plan §6) rather than committed
+ * to this public repo.
  *
- * **Staged, not final.** `public/site_*` is gitignored, so a build on any other
- * machine will 404 on these. To promote one: upload it to `sil006/web/cdn/`,
- * swap the path below for `cdnUrl("<file>")`, and delete the local copy.
+ * These do **not** take the `site_` prefix the constants above use — the files
+ * are named for what they show, as uploaded. The prefix rule exists to keep
+ * site chrome clear of the app's `habi_*` namespace; a screenshot is neither.
+ *
+ * Because `/cdn/**` is immutable, replacing a screenshot means uploading a new
+ * filename and changing the constant here. Until a name below is actually live,
+ * `AppScreenshot` renders its written stand-in — see the note there on why a
+ * missing file cannot be detected any earlier than the browser.
  */
 export const habiScreens = {
   /** The home screen: habit editor, weekly goal and pace, and the wheel. */
-  home: "/site_habisloth_home.png",
+  home: cdnUrl("tiny_good_deed.png"),
 } as const;

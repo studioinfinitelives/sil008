@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import {
-  AppScreenshot,
-  FeatureArt,
-  FeatureRow,
-} from "@/app/habisloth/_components/FeatureRow";
+import { AppScreenshot } from "@/app/habisloth/_components/AppScreenshot";
+import { FeatureArt, FeatureRow } from "@/app/habisloth/_components/FeatureRow";
 import { HabiSlothLinks } from "@/app/habisloth/_components/HabiSlothLinks";
 import { Button } from "@/components/ui/button";
 import { habiArt, habiScreens } from "@/lib/cdn";
