@@ -34,5 +34,5 @@ export const logoUrl = cdnUrl("site_infinitelives_logo.svg");
 export const cardArt = {
   teamevl: cdnUrl("site_card_teamevl.png"),
   habisloth: cdnUrl("site_card_habisloth.png"),
-  comingSoon: cdnUrl("site_card_comingsoon.png"),
+  comingSoon: cdnUrl("site_card_pbnk.svg"),
 } as const;
