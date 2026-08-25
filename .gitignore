@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# firebase CLI deploy cache
+/.firebase/
+
 # production
 /build
 
