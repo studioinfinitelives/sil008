@@ -2,9 +2,11 @@
  * Shared habit math, ported from the Habi Sloth app's `lib/utils/habits.dart`.
  *
  * The Dart original is the source of truth: it is what the app ships and what
- * the Python backend mirrors. This port exists so the marketing site's
- * interactive demos compute exactly what the product does — if the two ever
- * disagree, the demo is wrong.
+ * the Python backend mirrors. Nothing the site renders calls this today — the
+ * demos it was ported for have been removed — but it is kept, with its test
+ * suite mirroring `habits_test.dart`, as the checked reference any future
+ * explainer of how goals and pace work should be built on rather than
+ * re-derived. If this and the Dart ever disagree, this one is wrong.
  *
  * Two substitutions were unavoidable in the crossing:
  *
