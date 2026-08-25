@@ -50,11 +50,17 @@ export function FeatureRow({
 }
 
 /**
- * A framed illustration from the app's own CDN.
+ * An illustration from the app's own CDN.
+ *
+ * Every one of these is a transparent PNG, so it sits directly on the page with
+ * no panel behind it — a filled card would put a hard edge around art that was
+ * drawn to have none.
  *
  * `next/image` is unoptimized site-wide (there is no optimizer in a static
  * export), so width and height are load-bearing: without them the browser has
- * no aspect ratio to reserve and the row jumps as the art arrives.
+ * no aspect ratio to reserve and the row jumps as the art arrives. They are the
+ * files' true pixel dimensions — a guessed ratio reserves the wrong box and
+ * shifts the row anyway.
  */
 export function FeatureArt({
   src,
@@ -68,15 +74,43 @@ export function FeatureArt({
   height: number;
 }) {
   return (
-    <div className="bg-surface-alt overflow-hidden rounded-3xl p-6">
-      <Image
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        className="mx-auto h-auto w-full max-w-md"
-      />
-    </div>
+    <Image
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      className="mx-auto h-auto w-full max-w-md"
+    />
+  );
+}
+
+/**
+ * A screenshot of the running app.
+ *
+ * Unlike the illustrations this is a full opaque phone screen, so it gets
+ * rounded corners and a shadow to read as a device rather than as a rectangle
+ * dropped on the page. It is capped narrow because it is a tall portrait shot:
+ * at the illustrations' width it would be twice the height of its own row.
+ */
+export function AppScreenshot({
+  src,
+  alt,
+  width,
+  height,
+}: {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+}) {
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      className="mx-auto h-auto w-full max-w-[320px] rounded-3xl shadow-xl"
+    />
   );
 }
 
