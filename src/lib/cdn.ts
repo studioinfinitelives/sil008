@@ -36,3 +36,42 @@ export const cardArt = {
   habisloth: cdnUrl("site_card_habisloth.png"),
   comingSoon: cdnUrl("site_card_pbnk.svg"),
 } as const;
+
+/**
+ * Habi Sloth's own illustrations, served from the same `web/cdn/` the app
+ * itself loads them from — so the site shows a visitor exactly the art the app
+ * shows its users, and neither repo holds a second copy to keep in step.
+ *
+ * These names are the app's, not this site's, so they keep the app's `habi_*` /
+ * `background1_*` prefixes rather than the `site_` one above.
+ */
+export const habiArt = {
+  calendar: cdnUrl("habi_calendar.png"),
+  friends: cdnUrl("habi_friends.png"),
+  beach: cdnUrl("habi_beach.png"),
+  weights: cdnUrl("habi_weights.png"),
+  idea: cdnUrl("habi_idea_wide.png"),
+} as const;
+
+/**
+ * The habit wheel's backdrop, recoloured per the palette the user picked —
+ * mirroring `backgroundUrlForColorKey` in the app's `asset_urls.dart`.
+ *
+ * The app generates one of these for every selectable colour, so picking a key
+ * here is choosing which of the app's own looks the site shows. `background1`
+ * (no suffix) is the untinted default.
+ */
+export type BackgroundColorKey =
+  | "blush"
+  | "coral"
+  | "lemon"
+  | "mint"
+  | "peach"
+  | "sage"
+  | "tearose"
+  | "tiffanyblue"
+  | "vanilla";
+
+export function wheelBackgroundUrl(key: BackgroundColorKey): string {
+  return cdnUrl(`background1_${key}.png`);
+}
