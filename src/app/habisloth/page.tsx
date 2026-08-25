@@ -4,7 +4,6 @@ import {
   AppScreenshot,
   FeatureArt,
   FeatureRow,
-  MediaPlaceholder,
 } from "@/app/habisloth/_components/FeatureRow";
 import { HabiSlothLinks } from "@/app/habisloth/_components/HabiSlothLinks";
 import { Button } from "@/components/ui/button";
@@ -38,9 +37,6 @@ export const metadata: Metadata = {
  * The wheel is shown as a screenshot rather than rebuilt in the browser. A
  * recreation has to be kept in step with the app by hand and is wrong the
  * moment the app moves; a capture is simply what the app looks like.
- *
- * The remaining screenshots are still outstanding (plan §3); the row that wants
- * one says so rather than pretending otherwise.
  */
 export default function Page() {
   return (
@@ -99,7 +95,12 @@ export default function Page() {
           title="Goals by the week."
           mediaLeft
           media={
-            <MediaPlaceholder label="Screenshot: setting a weekly goal — pending capture (plan §3)" />
+            <FeatureArt
+              src={habiArt.week}
+              alt="A sloth pointing along the days of the week, each one marked by a different habit"
+              width={1196}
+              height={892}
+            />
           }
         >
           <p>
