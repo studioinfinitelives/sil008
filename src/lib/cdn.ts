@@ -9,9 +9,6 @@
  *
  * Differences from the Dart original:
  *
- * - **No flavor switch.** `asset_urls.dart` picks `sil006.web.app` or
- *   `sil006-dev.web.app` off an `APP_FLAVOR` dart-define. This site has no such
- *   concept, so production is hardcoded.
  * - **`site_` prefix.** These assets belong to the marketing site, not the app,
  *   so they stay clear of the `habi_*` / `background1_*` namespace.
  *
@@ -20,7 +17,25 @@
  * and changing the constant below.
  */
 
-const CDN_HOST = "https://sil006.web.app";
+/**
+ * Which sil006 project's CDN to hotlink, mirroring the `APP_FLAVOR`
+ * dart-define in `asset_urls.dart` — same variable name, same
+ * development-by-default, so the two projects behave alike.
+ *
+ * Read at **build time only**: this module is imported exclusively by server
+ * components, so the chosen host is baked into the exported HTML and never
+ * reaches the client bundle. That also makes the host the only reliable way to
+ * tell a dev export from a prod one, which is what the Makefile's deploy
+ * guards check.
+ *
+ * Defaulting to development means a bare `npm run dev` / `npm run build`
+ * points at the dev CDN; `make prod` is what selects production.
+ */
+const IS_PRODUCTION = process.env.APP_FLAVOR === "production";
+
+const CDN_HOST = IS_PRODUCTION
+  ? "https://sil006.web.app"
+  : "https://sil006-dev.web.app";
 
 /** Builds the Firebase Hosting URL for a `web/cdn/` file. */
 export function cdnUrl(fileName: string): string {

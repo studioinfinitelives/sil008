@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "sil008"
+  },
+  "targets": {
+    "sil008": {
+      "hosting": {
+        "dev": ["sil008-dev"],
+        "prod": ["sil008"]
+      }
+    }
+  }
+}

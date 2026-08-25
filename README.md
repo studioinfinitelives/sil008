@@ -76,13 +76,36 @@ Apple — iOS composites transparency onto black).
 
 ## Deploying
 
-```bash
-npm run build
-firebase hosting:channel:deploy preview   # always preview before production
-```
+Everything goes through the `Makefile`, which mirrors `../sil006/Makefile`.
 
-Click through every route on the preview URL before touching DNS: `cleanUrls`
-in `firebase.json` versus Next's `trailingSlash` is a known Firebase footgun.
+| Command             | What it does                                  |
+| ------------------- | --------------------------------------------- |
+| `make check`        | typecheck, lint, format check, tests          |
+| `make dev`          | build + deploy → <https://sil008-dev.web.app> |
+| `make prod`         | build + deploy → <https://sil008.web.app>     |
+| `make preview-prod` | production build on a 7-day preview channel   |
+
+Both Hosting sites live in the one `sil008` Firebase project (see `.firebaserc`,
+which maps the `dev` and `prod` deploy targets onto them). The dev site is
+served `X-Robots-Tag: noindex`, because it serves the same `robots.txt` and the
+same `infinitelives.io` canonical URLs as production.
+
+`APP_FLAVOR` selects which sil006 CDN the art is hotlinked from — the same
+variable, with the same development-by-default, as that project's dart-define.
+So `npm run dev` and a bare `npm run build` point at `sil006-dev.web.app`, and
+only `make prod` / `make preview-prod` build against the production CDN.
+
+Two things the Makefile handles that a hand-run `npm run build` does not:
+
+- **`out/` is removed before every build.** Next does not purge the export
+  directory, so a file dropped from the site otherwise keeps shipping.
+- **Deploy is guarded on the baked-in CDN host.** A dev and a prod export are
+  byte-identical apart from that host, so each deploy target greps `out/` both
+  ways and aborts rather than push the wrong flavor.
+
+Click through every route on `make preview-prod` before touching DNS:
+`cleanUrls` in `firebase.json` versus Next's `trailingSlash` is a known Firebase
+footgun.
 
 ## Licence
 

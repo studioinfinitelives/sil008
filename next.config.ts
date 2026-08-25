@@ -12,8 +12,15 @@ const nextConfig: NextConfig = {
     // No Next image optimizer exists in an export, so images must be unoptimized.
     unoptimized: true,
     // Art is hotlinked from the Habi Sloth CDN so none is committed here (§6).
+    // Both flavors are listed because `APP_FLAVOR` picks between them at build
+    // time — see `src/lib/cdn.ts`.
     remotePatterns: [
       { protocol: "https", hostname: "sil006.web.app", pathname: "/cdn/**" },
+      {
+        protocol: "https",
+        hostname: "sil006-dev.web.app",
+        pathname: "/cdn/**",
+      },
     ],
   },
 };
