@@ -50,6 +50,7 @@ export const habiArt = {
   friends: cdnUrl("habi_friends.png"),
   beach: cdnUrl("habi_beach.png"),
   weights: cdnUrl("habi_weights.png"),
+  week: cdnUrl("habi_week.png"),
   idea: cdnUrl("habi_idea_wide.png"),
   /** Habi asleep along a branch — the blog's stand-in while there is no blog. */
   points: cdnUrl("habi_points.png"),

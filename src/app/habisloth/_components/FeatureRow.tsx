@@ -113,17 +113,3 @@ export function AppScreenshot({
     />
   );
 }
-
-/**
- * Stands in for a screenshot that does not exist yet.
- *
- * Capturing them needs a real account and a scrub pass (plan §3), so the rows
- * that want one say so out loud rather than shipping a row that looks broken.
- */
-export function MediaPlaceholder({ label }: { label: string }) {
-  return (
-    <div className="border-line text-subtle flex aspect-[4/3] w-full max-w-md items-center justify-center rounded-3xl border-2 border-dashed p-6 text-center text-sm">
-      {label}
-    </div>
-  );
-}
