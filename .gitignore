@@ -42,3 +42,9 @@ next-env.d.ts
 
 # plan / working notes — never published
 /private
+
+# product art staged locally for review before it goes to the CDN.
+# This repo is public and the artwork is not MIT-licensed (plan §6), so nothing
+# under here may be committed. Once a file is on the CDN, delete it from
+# `public/` and point the constant in `src/lib/cdn.ts` at the CDN URL.
+/public/site_*

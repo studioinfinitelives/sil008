@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import {
+  AppScreenshot,
   FeatureArt,
   FeatureRow,
   MediaPlaceholder,
 } from "@/app/habisloth/_components/FeatureRow";
 import { HabiSlothLinks } from "@/app/habisloth/_components/HabiSlothLinks";
-import { HabitPaceDemo } from "@/app/habisloth/_components/HabitPaceDemo";
 import { Button } from "@/components/ui/button";
-import { habiArt } from "@/lib/cdn";
+import { habiArt, habiScreens } from "@/lib/cdn";
 
 const DESCRIPTION =
   "A habit tracking app for the easy going. Set a weekly goal and Habi Sloth works out the daily pace.";
@@ -32,12 +32,15 @@ export const metadata: Metadata = {
  * The Habi Sloth product page.
  *
  * Laid out as alternating feature rows with a lot of air between them: a short
- * written bite on one side, and on the other either the app's own art or — for
- * the wheel — the working thing itself. The wheel row is the page's argument,
- * so it comes first and is the one piece a visitor can actually operate.
+ * written bite on one side, and on the other either the app's own art or a shot
+ * of the running app. The wheel row is the page's argument, so it comes first.
  *
- * Screenshots are still outstanding (plan §3); the rows that want one say so
- * rather than pretending otherwise.
+ * The wheel is shown as a screenshot rather than rebuilt in the browser. A
+ * recreation has to be kept in step with the app by hand and is wrong the
+ * moment the app moves; a capture is simply what the app looks like.
+ *
+ * The remaining screenshots are still outstanding (plan §3); the row that wants
+ * one says so rather than pretending otherwise.
  */
 export default function Page() {
   return (
@@ -62,22 +65,33 @@ export default function Page() {
         <Image
           src={habiArt.idea}
           alt=""
-          width={1024}
-          height={512}
+          width={1272}
+          height={706}
           className="mt-6 h-auto w-full max-w-lg"
           priority
         />
       </section>
 
       <div className="mx-auto max-w-6xl px-5">
-        <FeatureRow title="One wheel. Every habit." media={<HabitPaceDemo />}>
+        <FeatureRow
+          title="One wheel. Every habit."
+          media={
+            <AppScreenshot
+              src={habiScreens.home}
+              alt="The Habi Sloth home screen: a habit called Tiny Good Deed with its weekly goal and daily pace, and the habit wheel below"
+              width={964}
+              height={1998}
+            />
+          }
+        >
           <p>
             Your habits sit around the wheel. Tap one to tick it off — the ring
             fills as you go, and the colour deepens each time you lap the
             day&rsquo;s target.
           </p>
           <p className="mt-4">
-            Have a go. The maths below is the app&rsquo;s own.
+            Everything for a habit lives on one screen. No menus to go digging
+            through.
           </p>
         </FeatureRow>
 
@@ -100,8 +114,8 @@ export default function Page() {
             <FeatureArt
               src={habiArt.friends}
               alt="Two sloths keeping a habit together"
-              width={1024}
-              height={1024}
+              width={1096}
+              height={701}
             />
           }
         >
@@ -118,8 +132,8 @@ export default function Page() {
             <FeatureArt
               src={habiArt.calendar}
               alt="A sloth marking off a calendar"
-              width={1024}
-              height={512}
+              width={1095}
+              height={852}
             />
           }
         >
@@ -135,8 +149,8 @@ export default function Page() {
             <FeatureArt
               src={habiArt.beach}
               alt="A sloth on holiday"
-              width={1024}
-              height={1024}
+              width={1151}
+              height={857}
             />
           }
         >
@@ -153,8 +167,8 @@ export default function Page() {
             <FeatureArt
               src={habiArt.weights}
               alt="A sloth lifting weights"
-              width={1024}
-              height={1024}
+              width={1003}
+              height={571}
             />
           }
         >
