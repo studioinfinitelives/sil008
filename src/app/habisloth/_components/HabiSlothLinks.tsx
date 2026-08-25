@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 
 /**
- * The Habi Sloth section's own support and legal nav.
+ * The Habi Sloth section's own legal nav.
  *
  * These links live here rather than in the site footer: they govern one
  * product, not the studio. Keeping them inside the section means the App Store
@@ -11,7 +11,6 @@ import type { Route } from "next";
  */
 
 const LINKS: ReadonlyArray<{ href: Route; label: string }> = [
-  { href: "/habisloth/support", label: "Support" },
   { href: "/habisloth/privacy", label: "Privacy Policy" },
   { href: "/habisloth/terms", label: "Terms & Conditions" },
 ];
@@ -27,7 +26,7 @@ export function HabiSlothLinks({ omit }: HabiSlothLinksProps) {
   return (
     <nav
       className="border-line mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t pt-6 text-sm"
-      aria-label="Habi Sloth support and legal"
+      aria-label="Habi Sloth legal"
     >
       {links.map((item) => (
         <Link

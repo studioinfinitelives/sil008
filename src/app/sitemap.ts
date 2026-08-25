@@ -8,9 +8,9 @@ import { absoluteUrl } from "@/lib/site";
  * `output: "export"` and lands in `out/sitemap.xml` as a real file.
  *
  * The routes are listed by hand because every one of them is hand-written
- * today. Once blog posts are backed by real content, the `/blog/*` entries
- * should be derived from the same source `generateStaticParams` reads, so a new
- * post cannot be published without appearing here.
+ * today. `/blog` is the holding page and has no posts under it. When posts do
+ * land, derive their entries from the same source their `generateStaticParams`
+ * reads, so a new post cannot be published without appearing here.
  */
 
 // Required under `output: "export"` — see `app/opengraph-image.tsx`.
@@ -23,7 +23,6 @@ const routes: ReadonlyArray<
 > = [
   { path: "/", changeFrequency: "monthly", priority: 1 },
   { path: "/habisloth", changeFrequency: "monthly", priority: 0.9 },
-  { path: "/habisloth/support", changeFrequency: "yearly", priority: 0.5 },
   // The privacy URL is what App Store / Play Store metadata points at, so it
   // is listed directly rather than left to be discovered through the section.
   { path: "/habisloth/privacy", changeFrequency: "yearly", priority: 0.4 },

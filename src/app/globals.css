@@ -253,46 +253,8 @@
   }
 }
 
-/* Range inputs need pseudo-element styling that reads far worse as arbitrary
-   variants than as plain CSS. `accent-color` alone leaves Chrome picking its
-   own unfilled-track colour, which goes near-black on a light surface. */
-@layer components {
-  .range-input {
-    width: 100%;
-    height: 1.25rem;
-    appearance: none;
-    background: transparent;
-    cursor: pointer;
-  }
-
-  .range-input::-webkit-slider-runnable-track,
-  .range-input::-moz-range-track {
-    height: 6px;
-    border: 1px solid var(--color-line);
-    border-radius: 999px;
-    background: var(--color-canvas);
-  }
-
-  .range-input::-webkit-slider-thumb {
-    appearance: none;
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-top: -0.475rem;
-    border: 2px solid var(--color-ink);
-    border-radius: 999px;
-    background: var(--color-brand);
-  }
-
-  .range-input::-moz-range-thumb {
-    width: 1.25rem;
-    height: 1.25rem;
-    border: 2px solid var(--color-ink);
-    border-radius: 999px;
-    background: var(--color-brand);
-  }
-}
-
-/* The habit wheel in §4 is the reason this matters. */
+/* Honour a reader who has asked the OS for less movement. Nothing here animates
+   heavily today, but the blanket rule costs nothing and covers whatever does. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

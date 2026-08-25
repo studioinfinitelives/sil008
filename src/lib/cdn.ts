@@ -72,30 +72,3 @@ export const habiScreens = {
   /** The home screen: habit editor, weekly goal and pace, and the wheel. */
   home: "/site_habisloth_home.png",
 } as const;
-
-/**
- * The habit wheel's backdrop, recoloured per the palette the user picked —
- * mirroring `backgroundUrlForColorKey` in the app's `asset_urls.dart`.
- *
- * The app generates one of these for every selectable colour, so picking a key
- * here is choosing which of the app's own looks the site shows. `background1`
- * (no suffix) is the untinted default.
- *
- * Used only by `HabitWheel`, which the page does not currently render — the
- * wheel is a screenshot for now (see `habiScreens`) while the recreation is
- * worked on.
- */
-export type BackgroundColorKey =
-  | "blush"
-  | "coral"
-  | "lemon"
-  | "mint"
-  | "peach"
-  | "sage"
-  | "tearose"
-  | "tiffanyblue"
-  | "vanilla";
-
-export function wheelBackgroundUrl(key: BackgroundColorKey): string {
-  return cdnUrl(`background1_${key}.png`);
-}
