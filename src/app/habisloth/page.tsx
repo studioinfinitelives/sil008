@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { HabiSlothLinks } from "@/app/habisloth/_components/HabiSlothLinks";
 import { PaceCalculator } from "@/app/habisloth/_components/PaceCalculator";
 import { PageShell } from "@/components/PageShell";
 
@@ -29,6 +30,7 @@ export default function Page() {
     >
       <h2 className="text-2xl font-bold">Try the pace maths</h2>
       <PaceCalculator />
+      <HabiSlothLinks omit="/habisloth" />
     </PageShell>
   );
 }

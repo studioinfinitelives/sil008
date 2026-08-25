@@ -24,7 +24,9 @@ const routes: ReadonlyArray<
   { path: "/", changeFrequency: "monthly", priority: 1 },
   { path: "/habisloth", changeFrequency: "monthly", priority: 0.9 },
   { path: "/habisloth/support", changeFrequency: "yearly", priority: 0.5 },
-  { path: "/habisloth/privacy", changeFrequency: "yearly", priority: 0.3 },
+  // The privacy URL is what App Store / Play Store metadata points at, so it
+  // is listed directly rather than left to be discovered through the section.
+  { path: "/habisloth/privacy", changeFrequency: "yearly", priority: 0.4 },
   { path: "/habisloth/terms", changeFrequency: "yearly", priority: 0.3 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.6 },
 ];
