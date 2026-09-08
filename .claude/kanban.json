@@ -1,0 +1,9 @@
+{
+  "owner": "studioinfinitelives",
+  "projectNumber": "4",
+  "repo": "studioinfinitelives/sil008",
+  "defaultStatus": "Claude",
+  "plansDir": "plans",
+  "testCommand": "make check",
+  "sharedPackage": "../sil_common"
+}

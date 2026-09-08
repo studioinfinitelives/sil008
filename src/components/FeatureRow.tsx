@@ -50,7 +50,7 @@ export function FeatureRow({
 }
 
 /**
- * An illustration from the app's own CDN.
+ * An illustration from the product's own CDN.
  *
  * Every one of these is a transparent PNG, so it sits directly on the page with
  * no panel behind it — a filled card would put a hard edge around art that was

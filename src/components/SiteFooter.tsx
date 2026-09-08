@@ -1,13 +1,18 @@
+import Link from "next/link";
+import { CookiePreferencesButton } from "@/components/CookiePreferencesButton";
 import { SITE_NAME } from "@/lib/site";
 
 /**
  * Site-wide footer.
  *
- * Deliberately thin — a copyright line and nothing else. Per-product legal
- * documents are **not** listed here: each product links its own privacy policy
- * and terms from its own section, so the studio shell never implies that one
- * product's terms govern another's. The studio contact address lives on the hub
- * under "Contact", and is not repeated here.
+ * Deliberately thin: a copyright line, the studio's privacy notice, and the way
+ * back into the cookie dialog. The privacy link belongs here precisely because
+ * that document governs the whole site — how *this* site uses cookies and
+ * analytics. Per-product legal documents still are **not** listed here: each
+ * product links its own privacy policy and terms from its own section, so the
+ * studio shell never implies that one product's terms govern another's. The
+ * studio contact address lives on the hub under "Contact", and is not repeated
+ * here.
  */
 export function SiteFooter() {
   return (
@@ -16,6 +21,10 @@ export function SiteFooter() {
         <p>
           © {new Date().getFullYear()} {SITE_NAME}, LLC
         </p>
+        <Link href="/privacy" className="text-subtle hover:text-ink">
+          Privacy
+        </Link>
+        <CookiePreferencesButton />
       </div>
     </footer>
   );

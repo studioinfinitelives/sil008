@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   LEGAL_DOCUMENTS,
   LEGAL_VERSION,
+  SITE_LEGAL_VERSION,
   parseInline,
   parseLegalMarkdown,
 } from "@/lib/legal";
@@ -145,4 +146,28 @@ describe("the committed documents", () => {
       expect(headings.at(-1)).toMatch(/Contact$/);
     },
   );
+
+  /**
+   * The studio's own notice is not in `LEGAL_DOCUMENTS` — it has no upstream to
+   * mirror — so it needs its own case, or a construct the renderer cannot handle
+   * would sail past this file and fail on a deploy instead.
+   */
+  it("parses the studio privacy notice at its own version", async () => {
+    const markdown = await readFile(
+      path.join(process.cwd(), "src", "content", "legal", "site-privacy.md"),
+      "utf8",
+    );
+    const result = parse(markdown, SITE_LEGAL_VERSION);
+
+    expect(result.title).toBe("Privacy and Cookies");
+    expect(result.version).toBe(SITE_LEGAL_VERSION);
+
+    const headings = result.blocks
+      .filter((block) => block.kind === "heading")
+      .map((block) => block.text.map((run) => run.value).join(""));
+
+    // The banner's "Learn more" is only honest if these two sections exist.
+    expect(headings).toContain("Cookies");
+    expect(headings).toContain("Changing your mind");
+  });
 });

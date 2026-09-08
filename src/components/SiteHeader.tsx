@@ -13,6 +13,7 @@ import { SITE_NAME } from "@/lib/site";
  */
 
 const NAV: ReadonlyArray<{ href: Route; label: string }> = [
+  { href: "/teamevl", label: "Team EvL" },
   { href: "/habisloth", label: "Habi Sloth" },
   { href: "/blog", label: "Blog" },
 ];
