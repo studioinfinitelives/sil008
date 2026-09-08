@@ -9,7 +9,7 @@
  *
  * Three layers, in dependency order:
  *
- * 1. **Raw brand palettes** (`--color-sil-*`, `--color-habi-*`) — provenance
+ * 1. **Raw brand palettes** (`--color-sil-*`, `--color-habi-*`, `--color-evl-*`) — provenance
  *    only. Never reference these outside this file.
  * 2. **Semantic tokens** (`--color-canvas`, `--color-ink`, `--color-brand` …) —
  *    what components consume, via utilities like `bg-canvas` / `text-ink`.
@@ -51,6 +51,16 @@
   --color-habi-heat-low: #e53935;
   --color-habi-heat-mid: #ffd600;
   --color-habi-heat-high: #43a047;
+
+  /* Team EvL, sampled from site_card_teamevl.png. The game has no app, so this
+     file is the source rather than a copy — unlike the habi-* block above. */
+  --color-evl-ritual: #3d2841; /* the ritual circle */
+  --color-evl-ritual-deep: #1b101f; /* its shadow */
+  --color-evl-violet: #543e56;
+  --color-evl-mist: #847082; /* ring highlight */
+  --color-evl-silver: #e2dde0; /* the wordmark */
+  --color-evl-gold: #d8b162; /* the gold element card */
+  --color-evl-blood: #94354b; /* the red element card */
 
   /* ── Semantic layer — studio, light. Every other combination overrides
         these same properties below. ─────────────────────────────────────── */
@@ -220,6 +230,46 @@
   --color-brand-bright: var(--color-habi-sky);
   --color-on-brand: #2b1a10; /* 11.31 on the yellow */
   --color-on-brand-bright: #2b1a10;
+}
+
+/* ── Team EvL, light ──────────────────────────────────────────────────────
+   Canvas stays the inherited white, as Habi Sloth's light block does.
+   Verified on that canvas: ink 13.31, subtle 7.97, link 7.32.
+   `--color-evl-mist` is only 4.54 — fills and rules, never body text. */
+[data-section="teamevl"] {
+  --color-surface: #efe9f1;
+  --color-surface-alt: #f5f1f6;
+  --color-line: #d6cbd9;
+
+  --color-ink: var(--color-evl-ritual);
+  --color-subtle: #5f4a60;
+  --color-link: var(--color-evl-blood);
+
+  --color-brand: var(--color-evl-ritual);
+  --color-brand-bright: var(--color-evl-gold);
+  /* Unlike Habi Sloth's yellow, this brand is dark — so white is the
+     on-colour: white on the ritual violet is 13.31. */
+  --color-on-brand: #ffffff;
+  --color-on-brand-bright: var(--color-evl-ritual); /* 6.58 on the gold */
+}
+
+/* ── Team EvL, dark ───────────────────────────────────────────────────────
+   A violet-black rather than the studio's neutral one, so the section still
+   reads as Team EvL. Verified: ink 15.49, subtle 8.07, link 9.40 — all AAA. */
+.dark [data-section="teamevl"] {
+  --color-canvas: #140e17;
+  --color-surface: #201829;
+  --color-surface-alt: #0d090f;
+  --color-line: #3a2c40;
+
+  --color-ink: #ece6ee;
+  --color-subtle: #b3a4b8;
+  --color-link: var(--color-evl-gold);
+
+  --color-brand: var(--color-evl-gold);
+  --color-brand-bright: #c9a6e0;
+  --color-on-brand: #140e17; /* 9.40 on the gold */
+  --color-on-brand-bright: #140e17; /* 9.06 */
 }
 
 @layer base {

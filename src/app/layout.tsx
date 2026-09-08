@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SiteAnalytics } from "@/components/analytics/SiteAnalytics";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -63,6 +64,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SiteHeader />
           {children}
           <SiteFooter />
+          {/*
+            Inside the provider so the banner picks up the theme, and last so the
+            fixed banner sits over the page without a z-index fight with the
+            sticky header — both are z-50, and this one is later in the DOM.
+          */}
+          <SiteAnalytics />
         </ThemeProvider>
       </body>
     </html>

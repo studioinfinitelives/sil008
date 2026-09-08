@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { AppScreenshot } from "@/app/habisloth/_components/AppScreenshot";
-import { FeatureArt, FeatureRow } from "@/app/habisloth/_components/FeatureRow";
 import { HabiSlothLinks } from "@/app/habisloth/_components/HabiSlothLinks";
+import { FeatureArt, FeatureRow } from "@/components/FeatureRow";
 import { Button } from "@/components/ui/button";
 import { habiArt, habiScreens } from "@/lib/cdn";
 
@@ -53,7 +53,13 @@ export default function Page() {
           size="lg"
           className="mt-2 h-13 rounded-full px-8 text-base font-bold tracking-wide uppercase"
         >
-          <a href={APP_URL}>Get Habi Sloth</a>
+          {/*
+            Both calls to action read "Get Habi Sloth", so the derived analytics
+            label cannot tell them apart — `data-analytics-id` names which one.
+          */}
+          <a href={APP_URL} data-analytics-id="get-habisloth-hero">
+            Get Habi Sloth
+          </a>
         </Button>
         <Image
           src={habiArt.idea}
@@ -186,7 +192,9 @@ export default function Page() {
           size="lg"
           className="mt-8 h-13 rounded-full px-8 text-base font-bold tracking-wide uppercase"
         >
-          <a href={APP_URL}>Get Habi Sloth</a>
+          <a href={APP_URL} data-analytics-id="get-habisloth-closing">
+            Get Habi Sloth
+          </a>
         </Button>
       </section>
 

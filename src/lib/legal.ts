@@ -267,3 +267,32 @@ export async function loadLegalDocument(
     origin,
   };
 }
+
+/**
+ * The studio's own privacy notice version.
+ *
+ * Unrelated to {@link LEGAL_VERSION}, which tracks what habisloth.app is
+ * serving. This document has no upstream — the markdown and the constant land
+ * in the same commit — so the assertion below exists only to stop the constant
+ * rotting away from the file it describes.
+ */
+export const SITE_LEGAL_VERSION = 1;
+
+/**
+ * Loads a legal document this repo owns, with no remote to mirror.
+ *
+ * Deliberately separate from {@link loadLegalDocument} rather than a third arm
+ * of {@link LEGAL_DOCUMENTS}: that map is about the two Habi Sloth documents
+ * fetched from the app, and a `remote` entry for a document that has no remote
+ * would make the fetch-and-assert path lie about what it is checking.
+ */
+export async function loadLocalLegalDocument(
+  fileName: string,
+  expectedVersion: number,
+): Promise<LegalDocument> {
+  const markdown = await readFile(path.join(FALLBACK_DIR, fileName), "utf8");
+  return {
+    ...parseLegalMarkdown(markdown, { expectedVersion }),
+    origin: "fallback",
+  };
+}

@@ -46,6 +46,14 @@ export const habiSlothPalette: OgPalette = {
   eyebrow: "#6a412d",
 };
 
+export const teamEvlPalette: OgPalette = {
+  background: "#140e17",
+  accent: "#d8b162",
+  title: "#ece6ee",
+  tagline: "#b3a4b8",
+  eyebrow: "#d8b162",
+};
+
 export interface OgCardProps {
   eyebrow: string;
   title: string;

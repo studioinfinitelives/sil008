@@ -1,6 +1,7 @@
 {
   "projects": {
-    "default": "sil008"
+    "default": "sil008",
+    "cdn": "sil-cdn-fa1a1"
   },
   "targets": {
     "sil008": {

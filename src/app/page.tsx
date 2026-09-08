@@ -34,7 +34,7 @@ export default function Page() {
           name="Team EvL"
           subtitle="The Card Game"
           src={cardArt.teamevl}
-          externalUrl="https://linktr.ee/teamevl"
+          to="/teamevl"
         />
         <ProjectCard
           name="Habi Sloth"

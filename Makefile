@@ -5,28 +5,23 @@
 #   dev   https://sil008-dev.web.app   served noindex, for review
 #   prod  https://sil008.web.app       becomes infinitelives.io at DNS cutover
 #
-# APP_FLAVOR picks which sil006 CDN the art is hotlinked from, exactly as that
-# project's --dart-define does (lib/utils/asset_urls.dart). It defaults to
-# development, so a plain `npm run dev` needs no flag.
-
-DEV_CDN := https://sil006-dev.web.app
-PROD_CDN := https://sil006.web.app
+# Art comes from one CDN host for every build (cdn.infinitelives.io, published
+# from sil006's cdn-studio/), so there is no build-time flavor: a dev export and
+# a prod export are byte-identical and differ only in which site they land on.
+# The dev site's noindex is a Hosting header, not a build flag (firebase.json).
 
 # `out/` is ALWAYS removed first: Next does not purge the export directory, so a
 # file dropped from the site would otherwise keep shipping from a stale build.
 define web_build
-rm -rf out && APP_FLAVOR=$(1) npm run build
+rm -rf out && npm run build
 endef
 
-# The CDN host is baked into the exported HTML at build time and is the only
-# thing that distinguishes a dev export from a prod one — the routes are
-# byte-identical otherwise. Guard both ways before every deploy, as sil006's
-# deploy-cdn-* targets do, so a stale `out/` cannot reach the wrong site.
-# $(1) = expected host, $(2) = host that must be absent, $(3) = target to re-run.
+# The flavor guard that used to live here greped for the per-flavor CDN host --
+# the only thing that told a dev export from a prod one. With one shared host
+# there is nothing left to discriminate on, so all that remains is a staleness
+# check. $(1) = target to re-run.
 define assert_export
-@test -f out/index.html || { echo "ABORT: no out/ -- run 'make $(3)' first"; exit 1; }
-@grep -rq "$(1)" out || { echo "ABORT: out/ does not hotlink $(1) -- run 'make $(3)' first"; exit 1; }
-@! grep -rq "$(2)" out || { echo "ABORT: out/ hotlinks $(2) -- wrong flavor, run 'make $(3)' first"; exit 1; }
+@test -f out/index.html || { echo "ABORT: no out/ -- run 'make $(1)' first"; exit 1; }
 endef
 
 ### LOCAL DEV
@@ -35,34 +30,47 @@ serve:
 	npm run dev
 
 ### DEVELOPMENT
-# Build against the dev CDN and publish to https://sil008-dev.web.app.
+# Build and publish to https://sil008-dev.web.app.
 .PHONY: dev build-dev deploy-dev
 dev: build-dev deploy-dev
 
 build-dev:
-	$(call web_build,development)
+	$(call web_build)
 
 deploy-dev:
-	$(call assert_export,$(DEV_CDN),$(PROD_CDN),build-dev)
+	$(call assert_export,build-dev)
 	firebase deploy --only hosting:dev
 
 ### PRODUCTION
-# Build against the prod CDN and publish to https://sil008.web.app.
+# Build and publish to https://sil008.web.app.
 # `preview-prod` puts the same build on a temporary channel instead — always the
 # last step before a DNS change (see README).
 .PHONY: prod build-prod deploy-prod preview-prod
 prod: build-prod deploy-prod
 
 build-prod:
-	$(call web_build,production)
+	$(call web_build)
 
 deploy-prod:
-	$(call assert_export,$(PROD_CDN),$(DEV_CDN),build-prod)
+	$(call assert_export,build-prod)
 	firebase deploy --only hosting:prod
 
 preview-prod: build-prod
-	$(call assert_export,$(PROD_CDN),$(DEV_CDN),build-prod)
+	$(call assert_export,build-prod)
 	firebase hosting:channel:deploy preview --only prod --expires 7d
+
+### CDN
+# Publish this site's art to the sil-studio-art Hosting site (cdn.infinitelives.io)
+# in the shared CDN project. Art only: no build, no site deploy, seconds not
+# minutes. sil006 publishes the app's site from its own cdn/ -- two repos, two
+# sites, one project, because one site can only have one publisher.
+#
+# A Hosting deploy deletes every file absent from the public dir, so guard on a
+# known file: a half-finished move would wipe live art.
+.PHONY: deploy-cdn
+deploy-cdn:
+	@test -f cdn/site_infinitelives_logo.svg || { echo "ABORT: cdn/ is missing site_infinitelives_logo.svg -- wrong dir or bad move"; exit 1; }
+	firebase deploy --only hosting:sil-studio-art -P cdn --config firebase.cdn.json
 
 ### CHECKS
 # Everything CI would run, if there were CI. `make check` before any deploy.
