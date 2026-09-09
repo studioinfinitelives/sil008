@@ -216,40 +216,52 @@ export default function Page() {
           down, so every drawn row below takes the opposite side to the one
           before it.
         */}
-        <FeatureRow
-          title="Human made. Human played."
-          media={<EvlPhotoCarousel />}
-        >
+        <FeatureRow title="Human played" media={<EvlPhotoCarousel />}>
           <p>
-            Made in Wisconsin, Designed in Illinois. Played on every continent.
-            Team EvL travels light and brings people together.
+            Team EvL is enjoyed worldwide as a language-independent game; it
+            even took a ship to Antarctica. Does that make the game better?
+            <br />
+            <br />
+            Absolutely. Call my bluff.
           </p>
         </FeatureRow>
-
         <FeatureRow
-          title="No other game like it"
-          mediaLeft
+          title="Human made"
           media={
-            /*
-              A transparent cutout like the rest of the drawn art, so it sits
-              straight on the page with no panel or corner radius behind it, and
-              it takes the same `max-w-md` — it is simply shorter than a 4:3
-              row, being a wide fan rather than a scene.
-            */
             <EvlArt
               {...evlArt.cards}
               alt="The Element cards — Dark, Light, Earth, Fire and Water — fanned out beside the Team EvL box"
               fallback="Picture the five Element cards fanned out beside the box"
             />
           }
+          mediaLeft
         >
           <p>
-            No other game has mechanics quite like this one, or your money back.
+            Handcrafted without AI entirely by one solo entrepreneur with a
+            10-year dream. Art, story, game mechanics, design, and good
+            old-fashioned elbow grease. Your support is immensely appreciated.
           </p>
         </FeatureRow>
 
         <FeatureRow
-          title="One action. That’s your turn."
+          title="No other game like it"
+          media={
+            <EvlArt
+              {...evlArt.ritualCards}
+              alt="Three Ritual Cards fanned out — Leviux, Harpies and Lucifer — each showing the Elements arranged around its circle"
+              fallback="Picture three Ritual Cards fanned out, each with its own arrangement of Elements"
+            />
+          }
+        >
+          <p>
+            Bluffing and risky strategies like you&rsquo;ve never played before.
+            You could win by luck, but the best win with the certainty of skill.
+          </p>
+        </FeatureRow>
+
+        <FeatureRow
+          title="Made in Wisconsin – Designed in Illinois"
+          mediaLeft
           media={
             <EvlArt
               {...evlArt.tokens}
@@ -259,65 +271,16 @@ export default function Page() {
           }
         >
           <p>
-            Move an Element in the ritual circle and nothing else. What you are
-            really buying is information, and more of it than anyone else has.
+            Team EvL is like an indie band. You are actually cooler than the
+            corporate gold diggers if you own a copy.
+            <br />
+            <br />
+            Monopoly sucks 🤘
           </p>
         </FeatureRow>
 
         <FeatureRow
-          title="Made in Wisconsin. Designed in Illinois"
-          mediaLeft
-          media={
-            /*
-              The Ritual Cards themselves, fanned so three of them show at once
-              — the row's copy is about reading the circle against the card, and
-              a fan says there is more than one to be dealt faster than a single
-              card would.
-            */
-            <EvlArt
-              {...evlArt.ritualCards}
-              alt="Three Ritual Cards fanned out — Leviux, Harpies and Lucifer — each showing the Elements arranged around its circle"
-              fallback="Picture three Ritual Cards fanned out, each with its own arrangement of Elements"
-            />
-          }
-        >
-          <p>
-            The Ritual Card names what the summoning needs. Read the circle
-            against it and work out what is still out of place.
-          </p>
-        </FeatureRow>
-
-        <FeatureRow
-          title="Different every time."
-          media={
-            /*
-              The demons themselves, which is the row's argument: a different
-              one is summoned each game, so the sheet says "different every
-              time" faster than a single scene could.
-
-              Transparent and sitting straight on the page like the other drawn
-              rows — no plate, no corner radius. The creatures are white fills
-              with black linework, so they read as intended against the dark
-              theme; on the light theme the white bodies drop away and the black
-              linework carries the shapes.
-            */
-            <EvlArt
-              {...evlArt.demons}
-              alt="Six demons that can be summoned in Team EvL — a beetle, a peacock, a cobra, a haloed fox, a bat and a phoenix"
-              fallback="Picture the six demons a game can summon, no two alike"
-            />
-          }
-        >
-          <p>
-            Think the Elements are in order? Say so. Get it right and the demon
-            arrives; get it wrong in front of everyone and you have just told
-            the table what you know.
-          </p>
-        </FeatureRow>
-
-        <FeatureRow
-          title="Table talk is EvL."
-          mediaLeft
+          title="Different every time"
           media={
             <EvlArt
               {...evlArt.elements}
@@ -327,24 +290,28 @@ export default function Page() {
           }
         >
           <p>
-            Talking is not a leak, it is the game. Lie, bargain, and read the
-            pauses.
+            You bluff, they bluff bluffing. Rinse and repeat. The game is played
+            in rounds. Players adapt and adjust on the fly. Slow is not always
+            certain. When you are predictable, they skip to the finish line.
           </p>
         </FeatureRow>
 
         <FeatureRow
-          title="Small Package. Complex Strategies."
+          title="Travel and player friendly"
+          mediaLeft
           media={
             <EvlArt
-              {...evlArt.demonCoins}
-              alt="The six demon tokens on their coloured discs"
-              fallback="Picture the six demon tokens on their coloured discs"
+              {...evlArt.travelBag}
+              alt="Five shrink-wrapped Team EvL decks spilling out of their cream drawstring bag"
+              fallback="Picture the decks spilling out of their drawstring travel bag"
             />
           }
         >
           <p>
-            Nudge your &ldquo;Team&rdquo; into summoning too soon. Their mistake
-            is your information.
+            Team EvL travels light and plays with a wide range of groups.
+            <br />
+            <br />
+            2–5 players · 60 min. Different every time.
           </p>
         </FeatureRow>
       </div>

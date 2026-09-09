@@ -122,6 +122,23 @@ export const evlArt = {
   /** The six demon tokens on their coloured discs. */
   demonCoins: { src: cdnUrl("evl_demon_coins.png"), width: 1200, height: 666 },
   /**
+   * The decks and their drawstring bag — what "travels light" actually means.
+   *
+   * The `_drawn` suffix is the second life of this row. It first ran a cut-out
+   * photograph of the same scene; this is that photograph redrawn, so the row
+   * now matches the illustrations around it instead of sitting apart from them.
+   * The suffix stays even though the photograph is gone, because the immutable
+   * cache means the old name can never be reused — see the note at the top.
+   *
+   * 1159px on the long edge, near enough the 1200 the rest of the drawn art
+   * gets, and delivered at that size rather than downscaled to it.
+   */
+  travelBag: {
+    src: cdnUrl("evl_travel_bag_drawn.png"),
+    width: 1159,
+    height: 896,
+  },
+  /**
    * The 2–5 players promo animation, from the game's own social art.
    *
    * The only moving picture on the site: an 11-second GIF, 110 frames, 3.2 MB.
