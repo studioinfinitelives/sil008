@@ -4,11 +4,8 @@ import { useState } from "react";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 /**
- * "Contact us" that swaps for the address on click, mirroring the behaviour of
- * the site this replaces.
- *
- * A client component purely for the `useState` toggle — the only interactive
- * element on an otherwise fully static hub page.
+ * "Contact us" that swaps for the address on click, as the site this replaces
+ * did. A client component purely for the toggle.
  */
 export function ContactReveal() {
   const [revealed, setRevealed] = useState(false);

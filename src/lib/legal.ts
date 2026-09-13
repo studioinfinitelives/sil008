@@ -4,34 +4,24 @@ import path from "node:path";
 /**
  * Habi Sloth's legal documents — fetched from the app at build time, not copied.
  *
- * The published policies live in `sil006/assets/legal/`. Flutter bundles
- * `assets/` into its web build, so the app itself serves them as plain markdown
- * at `habisloth.app/assets/assets/legal/{privacy,terms}.md`. That URL is the
- * source of truth: this site renders whatever the app is currently showing its
- * users, which is the only way two decoupled repos can be guaranteed to agree
- * on what the terms actually say.
+ * The app serves its own `assets/legal/` as markdown at
+ * `habisloth.app/assets/assets/legal/{privacy,terms}.md`. That URL is the source
+ * of truth, so this site renders whatever the app is currently showing users.
  *
- * Two guards make that safe (plan §5):
+ * Two guards:
  *
- * 1. **The version is asserted.** Every document carries an
- *    `**Effective date: … (version N)**` line. If `N` stops matching
- *    {@link LEGAL_VERSION}, the build throws. A bump in
- *    `sil006/lib/utils/legal.dart` therefore breaks this build loudly rather
- *    than silently serving terms that no longer match the app's.
- * 2. **A fallback copy is committed**, under `src/content/legal/`. If
- *    habisloth.app is unreachable the build uses the local copy instead of
- *    failing, so a static-site deploy never hard-depends on the app's uptime.
+ * 1. Version asserted. Each document carries `**Effective date: … (version N)**`;
+ *    if N stops matching `LEGAL_VERSION` the build throws rather than silently
+ *    serving terms that no longer match the app's.
+ * 2. Fallback committed under `src/content/legal/`, so an unreachable
+ *    habisloth.app does not fail the build.
  *
- * Server-only: this module reads the filesystem and runs exclusively at build
- * time, since `output: "export"` renders every Server Component during
- * `next build`.
+ * Server-only: reads the filesystem, runs at build time under `output: "export"`.
  */
 
 /**
- * The document version this site is written against.
- *
- * Bumping this is a deliberate act: check what actually changed upstream, then
- * refresh the fallback copies in `src/content/legal/` in the same commit.
+ * Bumping this is deliberate: review the upstream change, then refresh the
+ * fallback copies in `src/content/legal/` in the same commit.
  */
 export const LEGAL_VERSION = 3;
 
@@ -73,13 +63,12 @@ export interface LegalDocument {
 /* ─────────────────────────────────── parse ───────────────────────────────── */
 
 /**
- * The markdown subset the published documents actually use: `#`/`##` headings,
- * `-` bullets, blank-line-separated paragraphs, `**strong**` and `` `code` ``.
+ * The supported markdown subset is `#`/`##` headings, `-` bullets,
+ * blank-line-separated paragraphs, `**strong**` and `` `code` ``.
  *
- * Anything outside that subset throws rather than rendering wrong. These are
- * legal documents — a link or table added upstream that this parser quietly
- * dropped would mean serving an incomplete policy, so the failure is loud and
- * the fix is to teach the parser the new construct.
+ * Anything else throws rather than rendering wrong: a construct added upstream
+ * that this parser silently dropped would mean serving an incomplete legal
+ * document. The fix on a throw is to teach the parser, not to loosen this.
  */
 const UNSUPPORTED_BLOCKS: ReadonlyArray<{ test: RegExp; what: string }> = [
   { test: /^\s*>/, what: "block quotes" },
@@ -231,11 +220,9 @@ function toBlock(chunk: string): Block {
 const FALLBACK_DIR = path.join(process.cwd(), "src", "content", "legal");
 
 /**
- * Loads a legal document, preferring the copy habisloth.app is serving right
- * now and falling back to the committed one if that fetch fails.
- *
- * A version mismatch is **not** a fetch failure and is never swallowed — it
- * propagates and fails the build.
+ * Prefers the copy habisloth.app is serving, falling back to the committed one
+ * if the fetch fails. A version mismatch is NOT a fetch failure: it propagates
+ * and fails the build.
  */
 export async function loadLegalDocument(
   id: LegalDocumentId,
@@ -269,22 +256,16 @@ export async function loadLegalDocument(
 }
 
 /**
- * The studio's own privacy notice version.
- *
- * Unrelated to {@link LEGAL_VERSION}, which tracks what habisloth.app is
- * serving. This document has no upstream — the markdown and the constant land
- * in the same commit — so the assertion below exists only to stop the constant
- * rotting away from the file it describes.
+ * The studio's own notice version. Unrelated to `LEGAL_VERSION`, which tracks
+ * habisloth.app. This document has no upstream, so the assertion only stops the
+ * constant rotting away from the file it describes.
  */
 export const SITE_LEGAL_VERSION = 1;
 
 /**
- * Loads a legal document this repo owns, with no remote to mirror.
- *
- * Deliberately separate from {@link loadLegalDocument} rather than a third arm
- * of {@link LEGAL_DOCUMENTS}: that map is about the two Habi Sloth documents
- * fetched from the app, and a `remote` entry for a document that has no remote
- * would make the fetch-and-assert path lie about what it is checking.
+ * Loads a document this repo owns. Kept separate from `loadLegalDocument`
+ * rather than added to `LEGAL_DOCUMENTS`: a `remote` entry for a document with
+ * no remote would make the fetch-and-assert path lie about what it checks.
  */
 export async function loadLocalLegalDocument(
   fileName: string,

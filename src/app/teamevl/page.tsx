@@ -32,24 +32,14 @@ export const metadata: Metadata = {
 };
 
 /**
- * The Team EvL product page.
+ * The Team EvL product page. Same shape as Habi Sloth: pitch, photo turntable,
+ * alternating feature rows, closing call to action, link nav.
  *
- * Built to the same shape as Habi Sloth: a short pitch, a row of photographs
- * from real games on a turntable, alternating feature rows explaining the game
- * a beat at a time, a closing call to action, and then every destination the
- * Linktree currently carries. The photographs lead because they are the only
- * proof on the page that anyone plays this — the drawn rows can explain a rule
- * to somebody already interested, which is what the photographs are there to
- * make them.
+ * Every row goes through `EvlArt` for the stand-in path. The hero is the one
+ * exception; see the note on it.
  *
- * All of the art is on the CDN now — nothing is staged in `public/` any more —
- * so every row goes through `EvlArt` and gets a written stand-in if the file
- * cannot be fetched. The hero is the one exception: see the note on it.
- *
- * Sizes come with the URLs from `lib/cdn.ts` rather than being written out
- * here, because `next/image` is unoptimized site-wide and those numbers exist
- * only to reserve the box — they have to be what was actually uploaded, and the
- * one place that can be true is beside the filename.
+ * Sizes come with the URLs from `lib/cdn.ts` rather than being written here,
+ * because they must match the uploaded file — see that file.
  */
 
 /** Shared by both calls to action, so the pair cannot drift apart. */
@@ -57,25 +47,14 @@ const CTA_BUTTON =
   "h-13 rounded-full px-8 text-base font-bold tracking-wide uppercase";
 
 /**
- * The buy button, with the rulebook beside it.
+ * Buy button with the rulebook beside it.
  *
- * Someone deciding whether to buy a bluffing game wants to know how it plays
- * first, so the rules sit at the point of sale rather than only down in the
- * link list. Outline against the filled buy button: it is the second thing to
- * click, not a competing one.
+ * Resolves whichever edition is current, so a new printing changes
+ * `lib/rulebooks.ts` and nothing else. The PDF is off-site, hence a plain
+ * anchor in a new tab rather than a `Link`.
  *
- * The PDF is off-site (the studio's own CDN, not this export), which is why it
- * is a plain anchor opening in a new tab — leaving the page mid-decision is
- * exactly what this is meant to avoid.
- *
- * It is whichever edition is current rather than a fixed file, so a new
- * printing changes `lib/rulebooks.ts` and nothing else. Older editions are one
- * click further out, on /teamevl/rules.
- *
- * `area` is required rather than optional: both calls to action render the same
- * two button labels, so without it the analytics reports could not tell a click
- * at the top of the page from one at the bottom — which is the only interesting
- * thing about having two.
+ * `area` is REQUIRED, not optional: both calls to action render the same two
+ * button labels, so without it the reports cannot tell top from bottom.
  */
 function CallToAction({
   area,
@@ -102,16 +81,12 @@ function CallToAction({
 }
 
 /**
- * The blooms strip that signs off the page, under the last buy button.
+ * Decorative closing flourish. `alt=""` keeps it out of the accessibility tree.
  *
- * Purely decorative — `alt=""` keeps it out of the accessibility tree, because
- * it says nothing the heading above it has not already said.
- *
- * Both files are rendered and one is hidden by the `dark:` variant, the way
- * `ThemeToggle` swaps its icons. A single `<Image>` whose `src` depends on the
- * theme cannot work here: this is a static export, so the HTML is written
- * before anyone's theme is known, and picking in the browser would flash the
- * wrong ink on first paint.
+ * BOTH files render and the `dark:` variant hides one, as `ThemeToggle` does
+ * with its icons. A single `<Image>` switching `src` on theme cannot work: a
+ * static export is written before the theme is known, and choosing in the
+ * browser flashes the wrong ink on first paint.
  */
 function BloomsFlourish() {
   const size = { width: EVL_BLOOMS_WIDTH, height: EVL_BLOOMS_HEIGHT };
@@ -137,26 +112,18 @@ function BloomsFlourish() {
 export default function Page() {
   return (
     <main className="bg-canvas flex-1">
-      {/*
-        Pinned to the viewport rather than to a section, so it rides along the
-        whole scroll. One of the two client components on the page, the other
-        being the photo carousel that opens the rows.
-      */}
+      {/* Fixed to the viewport, so it rides the whole scroll. */}
       <EvlLinkDrawer />
 
       {/*
-        The width cap moved off the section and onto the children, so the hero
-        art can run wider than the copy above it: prose stays at a reading
-        measure, the banner takes the same `max-w-6xl` gutter as the feature
-        rows below, and both stay centred on the same axis.
+        The width cap sits on the children, not the section, so the hero art can
+        run wider than the copy while both stay centred on the same axis.
       */}
       <section className="flex flex-col items-center gap-6 px-5 py-20 text-center sm:py-28">
         {/*
-          No `text-balance` here, deliberately. The break after "game" is the
-          one we want, and balancing would even out the two halves by pulling
-          words off the first line even when it fits — which is the opposite of
-          the intent. Left to wrap normally, the first line breaks only on a
-          viewport too narrow to hold it.
+          No `text-balance` on the h1 below: the manual break after "game" is
+          intended, and balancing would pull words off the first line even when
+          it fits.
         */}
         <span className="bg-brand text-on-brand rounded-full px-4 py-1.5 text-xs font-bold tracking-wider uppercase">
           Team EvL
@@ -170,29 +137,16 @@ export default function Page() {
           Summon the Demon. Save the World.
         </p>
         {/*
-          The hero banner. `h-auto` against the declared 1600×600 is what keeps
-          it proportionate as it scales — the cap is on width alone, so the
-          height follows.
+          The hero banner, the page's LCP element. A plain `next/image` rather
+          than `EvlArt`, the only one on the page: it wants `priority`, which
+          the stand-in path has no use for.
 
-          The negative margins more than cancel the section's `gap-6`, because
-          the file carries 27.8% of its own height as transparent padding at the
-          top and bottom — left alone, that padding reads as a hole above the
-          banner and another below it.
-
-          They are percentages rather than a fixed `-mt-22`/`-mb-16` because
-          that padding scales with the image: it is ~120px of the 432px-tall
-          desktop render but only ~36px at 350px wide, so pixel margins that
-          look right on a desktop eat into the artwork on a phone, and the
-          tagline and buttons end up sitting on top of it. A percentage margin
-          resolves against the containing block's width, which is why the
-          wrapper below exists — it is capped to the same `max-w-6xl` as the
-          image, so the percentages track the render at every width.
-
-          A plain `next/image` rather than `EvlArt`, the only piece on the page
-          that is: this is the LCP element and wants `priority`, which the
-          stand-in path has no use for, and a dashed box reading "picture the
-          banner" under an `h1` that already says Team EvL would be worse than
-          the gap it fills.
+          The negative margins cancel transparent padding baked into the file,
+          which is 27.8% of its own height top and bottom. They are PERCENTAGES,
+          not fixed pixels, because that padding scales with the image: pixel
+          margins tuned on desktop eat into the artwork on a phone. A percentage
+          margin resolves against the containing block's width, which is why the
+          wrapper exists, capped to the same `max-w-6xl` as the image.
         */}
         <div className="w-full max-w-6xl">
           <Image
@@ -206,16 +160,7 @@ export default function Page() {
       </section>
 
       <div className="mx-auto max-w-6xl px-5">
-        {/*
-          The photographs open the rows: everything below is product art
-          explaining a rule, and this is the one row showing the game being
-          played rather than described — the reader meets the people first and
-          then finds out what they are doing.
-
-          Copy left, photographs right — and the alternation runs from here
-          down, so every drawn row below takes the opposite side to the one
-          before it.
-        */}
+        {/* The alternation starts here: every row below flips `mediaLeft`. */}
         <FeatureRow title="Human played" media={<EvlPhotoCarousel />}>
           <p>
             Team EvL is enjoyed worldwide as a language-independent game; it
@@ -318,22 +263,17 @@ export default function Page() {
 
       <section className="bg-surface-alt mt-10 px-5 py-20 text-center sm:py-24">
         {/*
-          The promo GIF signs the page off rather than opening it: it is the
-          one piece of art that moves, so it sits directly above the last buy
-          button where it is the final thing seen before the decision.
-
-          `EvlArt` centres itself, and the wrapper only caps how wide it runs
-          in a section that is otherwise full-bleed. It runs wider than the row
-          art — `max-w-3xl` is 768px, which is the largest round cap that still
-          sits under the GIF's own 870px, so it never upscales into softness.
+          `EvlArt` centres itself; the wrapper only caps its width in a section
+          that is otherwise full-bleed. `max-w-3xl` is 768px, the largest round
+          cap still under the GIF's own 870px, so it never upscales.
         */}
         <div className="mx-auto mb-10 w-full max-w-3xl">
           <EvlArt
             {...evlArt.players}
             alt="Team EvL promo animation, opening on a title card reading “2-5 players”"
             fallback="Picture the whole table leaning over one ritual circle"
-            // Opaque and hard-edged, unlike the transparent art the rows are
-            // waiting on, so it gets the corner the fallback box has.
+            // Opaque and hard-edged, unlike the transparent row art, so it
+            // takes the corner radius the stand-in box has.
             className="max-w-3xl rounded-2xl"
           />
         </div>

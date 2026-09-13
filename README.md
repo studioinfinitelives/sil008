@@ -1,8 +1,8 @@
 # infinitelives.io
 
-The Studio Infinite Lives website — the studio hub plus the Habi Sloth product
-section. Next.js App Router, TypeScript, Tailwind v4, statically exported and
-served from Firebase Hosting.
+The Studio Infinite Lives website — the studio hub plus the Habi Sloth and Team
+EvL product sections. Next.js App Router, TypeScript, Tailwind v4, statically
+exported and served from Firebase Hosting.
 
 ## Getting started
 
@@ -30,11 +30,15 @@ src/
     _components/            hub-only components
     habisloth/              product section, brand-scoped via data-section
       _components/          Habi Sloth-only components
+    teamevl/                product section, brand-scoped via data-section
+      _components/          Team EvL-only components
     opengraph-image.tsx     link-preview cards, rendered at build time
     sitemap.ts  robots.ts
   components/               UI shared across route subtrees
     ui/                     shadcn/ui primitives
+  content/legal/            committed fallback copies of the legal documents
   lib/                      site constants, CDN URLs, ported habit maths
+cdn/                        artwork, published separately by `make deploy-cdn`
 ```
 
 A component used by one route subtree lives in that route's `_components/`; one
@@ -62,9 +66,11 @@ restyles wholesale — no component knows which brand it renders under.
 
 ### Artwork
 
-Illustrations are hotlinked from the CDN via `src/lib/cdn.ts`, which is served
+Illustrations are served from the studio's own CDN host and named in
+`src/lib/cdn.ts`. The files themselves live in this repo's `cdn/` and are
+published by `make deploy-cdn`, independently of the site. That host is served
 immutable for a year — **a file there can never be updated in place**, so new
-art means a new filename.
+art means a new filename and a changed constant.
 
 The one exception is the studio mark: browsers require site icons on the site's
 own origin, so `src/app/icon.svg` is committed, along with `favicon.ico` and
@@ -84,24 +90,21 @@ Everything goes through the `Makefile`, which mirrors `../sil006/Makefile`.
 | `make dev`          | build + deploy → <https://sil008-dev.web.app> |
 | `make prod`         | build + deploy → <https://sil008.web.app>     |
 | `make preview-prod` | production build on a 7-day preview channel   |
+| `make deploy-cdn`   | publish `cdn/` artwork, no site build         |
 
 Both Hosting sites live in the one `sil008` Firebase project (see `.firebaserc`,
 which maps the `dev` and `prod` deploy targets onto them). The dev site is
 served `X-Robots-Tag: noindex`, because it serves the same `robots.txt` and the
 same `infinitelives.io` canonical URLs as production.
 
-`APP_FLAVOR` selects which sil006 CDN the art is hotlinked from — the same
-variable, with the same development-by-default, as that project's dart-define.
-So `npm run dev` and a bare `npm run build` point at `sil006-dev.web.app`, and
-only `make prod` / `make preview-prod` build against the production CDN.
+There is no build-time flavor. Every build points at the one studio art host, so
+a dev export and a production export are byte-identical and differ only in which
+site they land on. The dev site's `noindex` is a Hosting header rather than a
+build flag, which is why the two exports can be the same bytes.
 
-Two things the Makefile handles that a hand-run `npm run build` does not:
-
-- **`out/` is removed before every build.** Next does not purge the export
-  directory, so a file dropped from the site otherwise keeps shipping.
-- **Deploy is guarded on the baked-in CDN host.** A dev and a prod export are
-  byte-identical apart from that host, so each deploy target greps `out/` both
-  ways and aborts rather than push the wrong flavor.
+One thing the Makefile handles that a hand-run `npm run build` does not: **`out/`
+is removed before every build.** Next does not purge the export directory, so a
+file dropped from the site otherwise keeps shipping from a stale build.
 
 Click through every route on `make preview-prod` before touching DNS:
 `cleanUrls` in `firebase.json` versus Next's `trailingSlash` is a known Firebase

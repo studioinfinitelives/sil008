@@ -18,10 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  // Required before any metadata field may use a relative URL — without it,
-  // a relative `openGraph.images` is a build error rather than a silent bug.
-  // It is also what lets the OG card resolve to an absolute URL, which is the
-  // only form link-preview bots accept.
+  // Required before any metadata field may use a relative URL, and what
+  // resolves the OG card to an absolute one — the only form preview bots take.
   metadataBase: new URL(SITE_URL),
   // Section pages set their own title; this suffixes them.
   title: {
@@ -46,8 +44,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  // suppressHydrationWarning is required by next-themes: it writes the theme
-  // class onto <html> before React hydrates, so the server markup differs.
+  // `suppressHydrationWarning` is required by next-themes, which writes the
+  // theme class onto <html> before React hydrates.
   return (
     <html
       lang="en"
@@ -65,9 +63,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
           <SiteFooter />
           {/*
-            Inside the provider so the banner picks up the theme, and last so the
-            fixed banner sits over the page without a z-index fight with the
-            sticky header — both are z-50, and this one is later in the DOM.
+            Inside the provider so the banner picks up the theme, and LAST so it
+            sits over the sticky header without a z-index fight: both are z-50,
+            and this one is later in the DOM.
           */}
           <SiteAnalytics />
         </ThemeProvider>

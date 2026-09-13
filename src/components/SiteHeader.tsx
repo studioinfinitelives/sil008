@@ -4,12 +4,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { SITE_NAME } from "@/lib/site";
 
 /**
- * Site-wide masthead: wordmark home, section nav, theme switch.
- *
- * A server component — only {@link ThemeToggle} inside it needs the client, so
- * the nav itself costs no JavaScript. The links are plain `<Link>`s, which with
- * `typedRoutes` on means a typo in any path below fails `tsc` rather than
- * shipping a dead link.
+ * Site-wide masthead. A server component: only `ThemeToggle` needs the client,
+ * so the nav costs no JavaScript. `typedRoutes` fails `tsc` on a bad path below.
  */
 
 const NAV: ReadonlyArray<{ href: Route; label: string }> = [

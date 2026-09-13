@@ -1,29 +1,25 @@
 /**
- * Turns a clicked element into the event that should be reported for it.
+ * Turns a clicked element into the event to report for it.
  *
- * Delegated auto-capture is the whole point: one listener on `document` (see
- * `SiteAnalytics`) describes every link and button on the site, so the twenty-odd
- * existing components stay server components and nothing has to be instrumented
- * by hand. Two escape hatches exist for the cases the derived answer gets wrong:
+ * Delegated auto-capture: one listener on `document` (see `SiteAnalytics`)
+ * describes every link and button, so the components stay server components and
+ * nothing is instrumented by hand. Three opt-out/override hooks:
  *
- * - `data-analytics-id` overrides the label, for the three places that render
- *   the same button text twice on one page.
- * - `data-analytics-area` overrides the area, for the same reason.
- * - `data-analytics="off"` anywhere up the tree suppresses the event entirely —
- *   which is how the consent UI keeps itself out of the reports it is granting
- *   permission for.
+ * - `data-analytics-id` overrides the label.
+ * - `data-analytics-area` overrides the area.
+ * - `data-analytics="off"` anywhere up the tree suppresses the event, which is
+ *   how the consent UI stays out of the reports it is granting permission for.
  *
- * No DOM listeners and no gtag in here: it takes an element and returns a
+ * No DOM listeners and no gtag here — it takes an element and returns a
  * description, which is what makes it testable.
  */
 
-/** GA4 drops the whole event if any parameter value is longer than this. */
+/** GA4 drops the whole event if any parameter value exceeds this. */
 const MAX_PARAM_LENGTH = 100;
 
-/** Elements that count as a click target, in `closest()` order. */
 const CLICKABLE = "a[href], button, [role='button']";
 
-/** Landmarks whose tag name is a good enough name for "where on the page". */
+/** Landmarks whose tag name is a good enough "where on the page". */
 const AREA_TAGS = new Set([
   "header",
   "footer",
@@ -56,8 +52,8 @@ export function describeClickTarget(
     area: deriveArea(element),
   };
 
-  // `closest("a[href]")` can match an ancestor of a nested button, so check the
-  // element we actually found rather than assuming it is the anchor.
+  // `closest("a[href]")` can match an ancestor of a nested button, so test what
+  // was actually found rather than assuming it is the anchor.
   if (element instanceof HTMLAnchorElement) {
     params.link_url = truncate(element.href);
     // `hostname` is empty for mailto: and tel:, which never point at this site.
@@ -69,8 +65,9 @@ export function describeClickTarget(
 }
 
 /**
- * The most human-readable name available, in order of how deliberate it is:
- * an explicit override, then an accessible name, then what the visitor read.
+ * Most human-readable name available, in order of how deliberate it is:
+ * explicit override, accessible name, visible text, tooltip, then for a link
+ * with none of those, its path. An icon-only anchor reaches the last one.
  */
 function deriveLabel(element: Element): string {
   const candidates = [

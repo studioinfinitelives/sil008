@@ -5,14 +5,13 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { describeClickTarget } from "@/lib/click-tracking";
 
 /**
- * Delegated capture means these derivations run against markup nobody wrote for
- * analytics, so the cases that matter are the awkward ones: a click landing on
- * an icon inside a button, a label long enough for GA4 to drop the event, and
- * the consent UI opting itself out.
+ * Delegated capture runs against markup nobody wrote for analytics, so the
+ * cases that matter are the awkward ones: a click on an icon inside a button, a
+ * label long enough for GA4 to drop the event, the consent UI opting itself out.
  *
- * The docblock above puts jsdom on the real origin so a relative `href` resolves
- * the way it does on the site — otherwise every internal link on the page would
- * look outbound next to jsdom's default `localhost`.
+ * The `@vitest-environment-options` docblock above puts jsdom on the real
+ * origin. Without it every internal link looks outbound next to jsdom's default
+ * `localhost`.
  */
 
 const HOST = "infinitelives.io";

@@ -12,13 +12,12 @@ interface ProjectCardBase {
 }
 
 /**
- * A card is exactly one of three things, and the type says so: an internal
- * link, an external link, or not a link at all.
+ * A card is exactly one of three things: an internal link, an external link, or
+ * not a link.
  *
- * The `?: never` arms are load-bearing — they are what stops `to` and
- * `externalUrl` being passed together. This replaces an earlier
- * `href.startsWith("http")` check, which could not tell a typo'd internal path
- * from a real one; `to: Route` now fails `tsc` if the route does not exist.
+ * The `?: never` arms are load-bearing — they stop `to` and `externalUrl` being
+ * passed together. `to: Route` fails `tsc` when the route does not exist, which
+ * an `href.startsWith("http")` check could not do.
  */
 export type ProjectCardProps = ProjectCardBase &
   (
@@ -39,8 +38,8 @@ export function ProjectCard({
   to,
   externalUrl,
 }: ProjectCardProps) {
-  // `alt=""` marks the artwork decorative; the link carries the accessible name
-  // via aria-label, so a screen reader announces the label once, not twice.
+  // `alt=""` marks the artwork decorative and the link carries the accessible
+  // name, so a screen reader announces the label once rather than twice.
   const inner = (
     <>
       <Image

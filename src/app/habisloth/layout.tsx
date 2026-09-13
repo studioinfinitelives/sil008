@@ -1,9 +1,6 @@
 /**
- * Scopes the Habi Sloth palette to this route subtree.
- *
- * Everything under /habisloth renders inside `data-section="habisloth"`, which
- * swaps the semantic tokens in globals.css. Nothing else needs to know which
- * brand it is being rendered under — see plan §2.
+ * Scopes the Habi Sloth palette to this subtree. `data-section` swaps the
+ * semantic tokens in globals.css, so no component knows which brand it is in.
  */
 export default function HabiSlothLayout({
   children,

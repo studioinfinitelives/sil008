@@ -13,16 +13,8 @@ const LINKEDIN_ACTIVITY_URL =
   "https://www.linkedin.com/in/weberec7/recent-activity/all/";
 
 /**
- * A holding page until there is a blog to hold (plan §3).
- *
- * Rather than an empty shell, it says out loud that the writing is elsewhere
- * and sends the visitor to the LinkedIn feed that actually has it. The button
- * comes before the art so the one useful thing on the page is the first thing
- * reached — the sleeping sloth is the joke, not the destination.
- *
- * Button and art are centred as one column: the button is the whole point of
- * the page, and left-aligning it under a centred illustration would leave it
- * looking like a stray caption.
+ * A holding page until there is a blog. Points at the LinkedIn feed instead.
+ * The button precedes the art so the useful element is reached first.
  */
 export default function Page() {
   return (
@@ -41,11 +33,7 @@ export default function Page() {
             Ethan&rsquo;s LinkedIn Posts
           </a>
         </Button>
-        {/*
-          Width and height are the file's true pixels: `next/image` is
-          unoptimized in a static export, so they are what reserves the box and
-          keeps the page from jumping as the art loads.
-        */}
+        {/* True pixels — unoptimized, so these are what reserves the box. */}
         <Image
           src={habiArt.points}
           alt="Habi the sloth asleep along a tree branch"

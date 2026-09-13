@@ -2,12 +2,9 @@ import Link from "next/link";
 import type { Route } from "next";
 
 /**
- * The Habi Sloth section's own legal nav.
- *
- * These links live here rather than in the site footer: they govern one
- * product, not the studio. Keeping them inside the section means the App Store
- * and Play Store privacy-policy URLs stay discoverable to a crawler entering
- * anywhere under /habisloth, without the studio shell claiming them site-wide.
+ * The Habi Sloth section's legal nav. Here rather than in `SiteFooter` because
+ * these govern one product, not the studio. Keeps the store-listed privacy URLs
+ * crawlable from anywhere under /habisloth without claiming them site-wide.
  */
 
 const LINKS: ReadonlyArray<{ href: Route; label: string }> = [

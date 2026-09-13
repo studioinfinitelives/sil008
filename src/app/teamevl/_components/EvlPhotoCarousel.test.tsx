@@ -10,39 +10,23 @@ import { EvlPhotoCarousel } from "@/app/teamevl/_components/EvlPhotoCarousel";
 import { evlPhotos } from "@/app/teamevl/_components/evlPhotos";
 
 /**
- * The carousel's contract: six cards on the ring however many photographs it is
- * given, every one of them coming round in order, exactly one exposed to a
- * reader at a time, steps both ways by hand, and movement of its own — four
- * photos a second apart, then a fast-forward through the whole set that lands
- * back where it began — until something stops it.
+ * The carousel's contract: six cards whatever the photo count, every photo
+ * coming round in order, exactly one exposed at a time, manual steps both ways,
+ * and autoplay of four beats then a fast-forward that lands where it began.
  *
- * **The queue is the interesting part.** More photographs than cards means a
- * card has to change what it is showing, and the only acceptable place for that
- * is the back of the ring, hidden behind the photo facing the reader. That is
- * asserted directly: one step, exactly one card changed, and it is the one half
- * a turn away.
+ * The queue is the interesting part. More photographs than cards means a card
+ * must change what it shows, and the only acceptable place is the back of the
+ * ring. Asserted directly: one step, exactly one card changed, half a turn away.
  *
- * Which photo is at the front is read off the announced count, which is in the
- * DOM but not drawn on the page; `frontAlt` checks the two agree.
+ * `inert` rather than absence marks "not the front card" — all six cards are
+ * always in the DOM. Counts come from `evlPhotos`, so adding a photograph is
+ * not a test edit. The `transform` string is deliberately not asserted; pinning
+ * the geometry would make every restyle a test edit.
  *
- * Counts come from `evlPhotos` rather than being written out, so adding a
- * photograph is not a test edit.
- *
- * The `transform` string is deliberately not asserted, on the same reasoning as
- * `EvlLinkDrawer.test.tsx`: what the carousel does is its contract, the angle
- * it does it at is a fact about the stylesheet, and pinning it would make every
- * tweak to the geometry a test edit.
- *
- * `inert` rather than absence is how "not the front card" is asserted — all six
- * cards are always in the DOM, because a ring needs all of them.
- *
- * **`fireEvent`, not `userEvent`.** This file has to drive the clock, and
- * `userEvent` deadlocks against Vitest's fake timers here whatever
- * `advanceTimers` or `delay` it is handed — the click never resolves and the
- * test times out at five seconds. `fireEvent` is synchronous, is wrapped in
- * `act` by Testing Library, and dispatches the same events these handlers
- * listen for. `EvlLinkDrawer.test.tsx` keeps `userEvent` because it has no
- * timers to fake.
+ * USE `fireEvent`, NOT `userEvent`. This file drives the clock, and `userEvent`
+ * deadlocks against Vitest's fake timers whatever `advanceTimers` or `delay` it
+ * is given: the click never resolves and the test times out.
+ * `EvlLinkDrawer.test.tsx` keeps `userEvent` because it fakes no timers.
  */
 
 const BEAT_MS = 1000;
@@ -51,11 +35,7 @@ const BEAT_MS = 1000;
 const SLOTS = 6;
 const COUNT = evlPhotos.length;
 
-/**
- * How long the fast-forward runs, plus the breath the component leaves after
- * it: one pass through the whole set at ten photos a second, then 80 ms of
- * settling. Mirrored from the component — these numbers are its contract.
- */
+/** Mirrored from the component; these numbers are its contract. */
 const FAST_MS = (COUNT / 10) * 1000;
 const SETTLE_MS = 80;
 
@@ -72,10 +52,9 @@ const frontSlot = () =>
 const readout = () => screen.getByText(new RegExp(`of ${COUNT}$`));
 const button = (name: RegExp) => screen.getByRole("button", { name });
 
-/** The stage is the ring's parent — what the pointer and click handlers sit on. */
+/** The ring's parent, where the pointer and click handlers sit. */
 const stage = () => figures()[0]?.parentElement?.parentElement;
 
-/** Advance the autoplay chain by whole beats, inside `act`. */
 function beats(count: number) {
   for (let index = 0; index < count; index += 1) {
     advance(BEAT_MS);
@@ -132,8 +111,8 @@ describe("EvlPhotoCarousel", () => {
     render(<EvlPhotoCarousel />);
 
     const before = alts();
-    // Half a turn from the card facing the reader is the card directly behind
-    // it — the smallest, the most occluded, and the only place a swap belongs.
+    // Half a turn from the front is the most occluded slot, the only place a
+    // swap belongs.
     const hidden = (frontSlot() + SLOTS / 2) % SLOTS;
 
     fireEvent.click(button(/next photo/i));
@@ -161,9 +140,8 @@ describe("EvlPhotoCarousel", () => {
     beats(3);
     expect(readout()).toHaveTextContent(position(4));
 
-    // The fast-forward runs the length of the queue, so it comes back to the
-    // photograph it left on: the fifth beat does not change what is at the
-    // front, and the beats pick up from there once it has run.
+    // The sweep runs the length of the queue, so it returns to the photograph
+    // it left on: the fifth beat does not change the front.
     beats(1);
     expect(readout()).toHaveTextContent(position(4));
     expect(frontAlt()).toBe(evlPhotos[4]?.alt);

@@ -5,17 +5,15 @@ import { EvlLinkDrawer } from "@/app/teamevl/_components/EvlLinkDrawer";
 import { evlLinks } from "@/lib/evlLinks";
 
 /**
- * The drawer's contract: it is shut until asked for, it carries the whole link
- * list, and every way out of it works.
+ * The drawer's contract: shut until asked for, carries the whole link list,
+ * every way out works.
  *
- * The panel is never unmounted — it is translated off-screen — so "closed" is
- * asserted through `inert` and `aria-expanded` rather than through absence.
- * `inert` is the load-bearing one: it is what keeps a keyboard user from
- * tabbing into a drawer that is sitting off the right-hand edge of the screen.
+ * The panel is never unmounted, only translated off-screen, so "closed" is
+ * asserted through `inert` and `aria-expanded` rather than absence. `inert` is
+ * the load-bearing one: it keeps a keyboard user out of an off-screen drawer.
  *
- * Transform classes are deliberately not asserted. What the tab is for is a
- * fact about the component; which Tailwind utility slides it is a fact about
- * the stylesheet, and pinning it here would make every restyle a test edit.
+ * Transform classes are deliberately not asserted; pinning them would make
+ * every restyle a test edit.
  */
 
 const tab = () => screen.getByRole("button", { name: /looking for me/i });
@@ -89,8 +87,8 @@ describe("EvlLinkDrawer", () => {
     render(<EvlLinkDrawer />);
 
     await user.click(tab());
-    // The catcher only exists while the drawer is open, and is hidden from
-    // assistive technology — hence the query by attribute rather than by role.
+    // The catcher is hidden from assistive technology, hence the attribute
+    // query rather than a role query.
     const catcher = document.querySelector<HTMLElement>(
       'button[aria-hidden="true"]',
     );
@@ -104,8 +102,8 @@ describe("EvlLinkDrawer", () => {
     const user = userEvent.setup();
     render(<EvlLinkDrawer />);
 
-    // jsdom cannot navigate and says so on stderr for every real click, so the
-    // default is swallowed after the component's own handler has run.
+    // jsdom cannot navigate and logs to stderr on every real click, so the
+    // default is swallowed after the component's handler has run.
     const swallow = (event: MouseEvent) => event.preventDefault();
     document.addEventListener("click", swallow);
     try {

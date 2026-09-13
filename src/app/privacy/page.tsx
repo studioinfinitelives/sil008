@@ -11,15 +11,11 @@ export const metadata: Metadata = {
 };
 
 /**
- * The studio's own privacy and cookie notice.
+ * The studio's own privacy and cookie notice. Separate from
+ * `/habisloth/privacy`, which governs the app. This is what the cookie banner's
+ * "Learn more" points at, so it must describe THIS site's cookies.
  *
- * Separate from `/habisloth/privacy` on purpose: that document governs the app,
- * and a Team EvL visitor reading it would be told about accounts and offline
- * data that have nothing to do with this site. It is also what the cookie
- * banner's "Learn more" points at, so it has to describe *this* site's cookies.
- *
- * Unlike the Habi Sloth documents this one has no upstream to mirror — the
- * markdown is committed here and read straight off disk at build time.
+ * No upstream to mirror: the markdown is committed and read off disk at build.
  */
 export default async function Page() {
   const document = await loadLocalLegalDocument(

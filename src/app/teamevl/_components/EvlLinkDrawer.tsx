@@ -6,31 +6,23 @@ import { useEffect, useId, useState } from "react";
 import { evlLinks } from "@/lib/evlLinks";
 
 /**
- * A pull tab on the right edge of /teamevl that slides out the link list.
+ * A pull tab on the right edge of /teamevl that slides out the link list. A
+ * shortcut to the same destinations `TeamEvlLinks` carries at the foot of the
+ * page, which stays.
  *
- * The same destinations run along the bottom of the page, but that nav is six
- * screens down from the hero — this puts the store, the rules and the Discord
- * one click away wherever the reader has got to. The bottom nav stays: this is
- * a shortcut to it, not a replacement.
- *
- * **The tab and the panel slide together**, as one strip translated by the
- * panel's own width, so the tab reads as the handle physically attached to the
- * drawer rather than a button that happens to sit beside it. That is why the
- * width appears twice — `w-64` on the panel and `translate-x-64` on the strip —
- * and the two must be changed together.
+ * THE WIDTH APPEARS TWICE and must be changed together: `w-64` on the panel and
+ * `translate-x-64` on the strip. Tab and panel slide as one strip so the tab
+ * reads as a handle attached to the drawer.
  *
  * The panel is always rendered and hidden by transform rather than unmounted,
  * which is what lets it animate. `inert` is what makes that safe: while closed
- * it takes the links out of the tab order and out of the accessibility tree,
- * so a keyboard or screen-reader user cannot land inside a drawer they cannot
- * see, and the drawer's nav landmark is only announced while it is open.
+ * it takes the links out of the tab order and the accessibility tree, so nobody
+ * can land inside a drawer they cannot see.
  *
- * Non-modal by design — the page behind stays scrollable and readable, so there
- * is no focus trap. Escape, the tab itself, a click anywhere off it, and
- * following any link all close it.
+ * Non-modal: the page behind stays scrollable, so there is no focus trap.
+ * Escape, the tab, a click away, and following a link all close it.
  */
 
-/** Kept for the pull tab, which is thin enough to swallow a stray tap. */
 const TAB_CLASS =
   "bg-brand text-on-brand flex cursor-pointer flex-col items-center gap-2 self-center rounded-l-xl py-5 pr-1.5 pl-2 shadow-lg transition-colors";
 
@@ -53,11 +45,10 @@ export function EvlLinkDrawer() {
   return (
     <>
       {/*
-        The click-away catcher. A `<button>` rather than a bare `<div>` so the
-        click handler sits on something that is meant to be clicked, and
-        `tabIndex={-1}` with `aria-hidden` keeps it out of the tab order and out
-        of the accessibility tree — Escape is the keyboard equivalent, and a
-        full-screen "close" control announced to a screen reader is noise.
+        Click-away catcher. A `<button>` so the handler sits on something meant
+        to be clicked; `tabIndex={-1}` plus `aria-hidden` keep it out of the tab
+        order and the accessibility tree, where a full-screen "close" control
+        would be noise. Escape is the keyboard equivalent.
       */}
       {open ? (
         <button
@@ -88,9 +79,9 @@ export function EvlLinkDrawer() {
             }`}
           />
           {/*
-            Vertical text, reading bottom-to-top: `vertical-rl` alone runs it
-            top-to-bottom with the glyphs on their right side, which is the
-            wrong rotation for a Latin label on a left-hand tab.
+            `vertical-rl` alone runs top-to-bottom with the glyphs on their
+            right side, the wrong rotation for a Latin label on this tab. Hence
+            the extra `rotate-180`.
           */}
           <span className="rotate-180 text-xs font-bold tracking-widest uppercase [writing-mode:vertical-rl]">
             Looking for Me?
@@ -100,9 +91,8 @@ export function EvlLinkDrawer() {
         <nav
           id={panelId}
           inert={!open}
-          // Distinct from the nav that closes the page, which carries the same
-          // links under "Team EvL links" — two identically named landmarks
-          // would be indistinguishable in a landmark list.
+          // Must differ from `TeamEvlLinks`'s "Team EvL links": two identically
+          // named landmarks are indistinguishable in a landmark list.
           aria-label="Team EvL links drawer"
           className="border-line bg-surface flex w-64 flex-col gap-1 rounded-l-xl border-y border-l p-4 shadow-lg"
         >

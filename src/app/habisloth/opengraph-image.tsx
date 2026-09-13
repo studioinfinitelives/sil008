@@ -2,9 +2,8 @@ import { ImageResponse } from "next/og";
 import { habiSlothPalette, OG_CONTENT_TYPE, OG_SIZE, OgCard } from "@/lib/og";
 
 /**
- * Habi Sloth's card. Being at this level of the tree, it is inherited by
- * `/habisloth/privacy` and `/terms` too — so a legal link pasted into a chat
- * still unfurls as Habi Sloth rather than the studio.
+ * Habi Sloth's card. At this level of the tree it is inherited by
+ * `/habisloth/privacy` and `/terms`, so a legal link unfurls as the product.
  */
 
 // See the note in `app/opengraph-image.tsx` — required under `output: "export"`.

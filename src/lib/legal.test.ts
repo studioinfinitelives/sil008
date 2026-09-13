@@ -10,10 +10,9 @@ import {
 } from "@/lib/legal";
 
 /**
- * The parser is the load-bearing part: it decides both what these pages say and
- * whether the build is allowed to succeed. The last block runs it over the real
- * committed documents, so an upstream refresh that introduces a construct the
- * renderer cannot handle fails here rather than on a deploy.
+ * The parser decides both what these pages say and whether the build succeeds.
+ * The last block runs it over the real committed documents, so an upstream
+ * refresh introducing an unsupported construct fails here, not on a deploy.
  */
 
 const parse = (markdown: string, expectedVersion = LEGAL_VERSION) =>
@@ -141,16 +140,14 @@ describe("the committed documents", () => {
 
       expect(headings.length).toBeGreaterThan(5);
       expect(headings[0]).toMatch(/^1\. /);
-      // Both policies close by telling the reader how to reach us; if that
-      // section ever disappears, the studio has a bigger problem than a parser.
       expect(headings.at(-1)).toMatch(/Contact$/);
     },
   );
 
   /**
-   * The studio's own notice is not in `LEGAL_DOCUMENTS` — it has no upstream to
-   * mirror — so it needs its own case, or a construct the renderer cannot handle
-   * would sail past this file and fail on a deploy instead.
+   * The studio's notice is not in `LEGAL_DOCUMENTS` (no upstream to mirror), so
+   * it needs its own case or an unsupported construct would sail past this file
+   * and fail on a deploy.
    */
   it("parses the studio privacy notice at its own version", async () => {
     const markdown = await readFile(
@@ -166,7 +163,7 @@ describe("the committed documents", () => {
       .filter((block) => block.kind === "heading")
       .map((block) => block.text.map((run) => run.value).join(""));
 
-    // The banner's "Learn more" is only honest if these two sections exist.
+    // The cookie banner's "Learn more" points here; these sections must exist.
     expect(headings).toContain("Cookies");
     expect(headings).toContain("Changing your mind");
   });

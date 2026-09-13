@@ -13,17 +13,12 @@ import {
 } from "./habits";
 
 /**
- * Unit tests for the ported habit math in `lib/habits.ts`.
+ * Mirrors `sil006/test/utils/habits_test.dart` case-for-case. The Dart suite is
+ * the oracle: changing a case here stops it testing the app's behaviour.
  *
- * Mirrors `sil006/test/utils/habits_test.dart` case-for-case: same fixture
- * week, same inputs, same expected values. The Dart suite is the oracle — if a
- * case here is changed, it has stopped testing the app's behaviour.
- *
- * The fixed week used throughout is the week of Monday 2024-06-10
- * (Tue 6-11, Wed 6-12, Fri 6-14, Sat 6-15, Sun 6-16).
+ * Fixture week throughout is the week of Monday 2024-06-10.
  */
 
-// Concrete days within one ISO week so weekday math is unambiguous.
 // Month is 0-indexed in JS: 5 = June.
 const monday = new Date(2024, 5, 10);
 const tuesday = new Date(2024, 5, 11);
@@ -32,7 +27,6 @@ const friday = new Date(2024, 5, 14);
 const saturday = new Date(2024, 5, 15);
 const sunday = new Date(2024, 5, 16);
 
-// Sanity check the calendar assumptions the cases rely on.
 test("fixture week has the expected ISO weekdays", () => {
   expect(isoWeekday(monday)).toBe(Weekday.monday);
   expect(isoWeekday(tuesday)).toBe(Weekday.tuesday);
@@ -42,8 +36,7 @@ test("fixture week has the expected ISO weekdays", () => {
   expect(isoWeekday(sunday)).toBe(Weekday.sunday);
 });
 
-// Not in the Dart suite: guards the 0=Sun/1=Mon substitution this port had to
-// make. Sunday is where the two conventions disagree most loudly.
+// Not in the Dart suite: guards the 0=Sun/1=Mon substitution the port made.
 describe("getWeekMonday (port-specific)", () => {
   test("every day of the fixture week maps back to Monday", () => {
     for (const day of [monday, tuesday, wednesday, friday, saturday, sunday]) {
@@ -183,8 +176,6 @@ describe("computeDayCompletionFraction", () => {
   });
 
   test("over pace is uncapped (mirrors the per-day calendar scoring)", () => {
-    // A single day is not capped — a 2x day reads 2.0; the caller clamps the
-    // averaged result, not the individual day.
     expect(computeDayCompletionFraction({ count: 2, expectedPace: 1.0 })).toBe(
       2.0,
     );
@@ -277,8 +268,8 @@ describe("computeInnerFillFraction", () => {
   });
 });
 
-// The wheel's hide-on-pace toggle hides exactly the habits this returns true
-// for, so every case here doubles as "the button the user saw read full".
+// The hide-on-pace toggle hides exactly what this returns true for, so every
+// case doubles as "the button the user saw read full".
 describe("isOnPaceForWeek", () => {
   test("exactly on pace is on pace", () => {
     expect(
@@ -341,9 +332,9 @@ describe("isOnPaceForWeek", () => {
   });
 
   test("an unstamped expectedPace scores like the button (pace of 1)", () => {
-    // A pre-expectedPace doc: the fill guard divides by 1, so a count for
-    // every day passed still reads full — hiding must agree with what the
-    // wheel paints, not invent a stricter rule.
+    // Pre-expectedPace doc: the fill guard divides by 1, so a count for every
+    // day passed still reads full. Hiding must agree with what the wheel
+    // paints rather than invent a stricter rule.
     expect(
       isOnPaceForWeek({
         weekCount: 2,

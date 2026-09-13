@@ -25,20 +25,17 @@ export const OPEN_PREFERENCES_EVENT = "sil:cookie-preferences";
 /**
  * The site's one analytics client component, mounted once from the root layout.
  *
- * It owns the whole feature: the stored consent choice, the banner, the
- * preferences dialog, per-route page views and the delegated click listener.
- * Nothing else in the tree has to know analytics exists — which is what keeps
- * every page and both product sections as server components.
+ * Owns the whole feature: stored consent, the banner, the preferences dialog,
+ * per-route page views, the delegated click listener. Nothing else in the tree
+ * knows analytics exists, which is what keeps every page a server component.
  *
- * With no measurement ID configured this renders `null` and registers nothing,
- * so the site is byte-for-byte the site it was before this feature landed.
+ * Renders null and registers nothing without a measurement ID.
  */
 export function SiteAnalytics() {
   const pathname = usePathname();
-  // One piece of state rather than a `mounted` flag beside a `choice`: the outer
-  // `null` means "storage not read yet", the inner one means "read, and nobody
-  // has decided". Keeping them together is also what lets the mount effect below
-  // settle everything in a single render.
+  // One piece of state rather than a `mounted` flag beside a `choice`: outer
+  // null means "storage not read yet", inner null means "read, nobody decided".
+  // Together they let the mount effect settle in a single render.
   const [consent, setConsent] = useState<{
     choice: ConsentChoice | null;
   } | null>(null);
@@ -47,14 +44,14 @@ export function SiteAnalytics() {
   const choice = consent?.choice ?? null;
   const granted = choice?.analyticsGranted === true;
 
-  // Restore whatever this browser decided last time. Applied without logging a
-  // consent event: replaying a stored decision is not a fresh one (the app draws
-  // the same distinction — `cookie_consent_service.dart`, `logConsentGranted`).
+  // Restore this browser's stored decision, without logging a consent event:
+  // replaying a stored choice is not a fresh one (same distinction the app
+  // draws in `cookie_consent_service.dart`).
   //
-  // The one setState-in-an-effect here is the shape that rule exempts:
-  // `localStorage` cannot be read during render, because a static export renders
-  // on a machine that has none, and a value guessed on the server would mismatch
-  // on hydration and flash the banner at someone who answered months ago.
+  // The setState-in-effect is unavoidable. `localStorage` cannot be read during
+  // render (a static export renders on a machine that has none), and a value
+  // guessed on the server would mismatch on hydration and flash the banner at
+  // someone who answered months ago.
   useEffect(() => {
     if (!isAnalyticsConfigured()) return;
     const stored = readConsent();
@@ -63,14 +60,14 @@ export function SiteAnalytics() {
     if (stored !== null) setAnalyticsConsent(stored.analyticsGranted);
   }, []);
 
-  // Page views, including the first: `gtag('config')` is configured with
-  // `send_page_view: false` precisely so this effect is the only source.
+  // Page views including the first: `config` sets `send_page_view: false` so
+  // this effect is the only source.
   useEffect(() => {
     if (granted) trackPageView();
   }, [pathname, granted]);
 
-  // Delegated click capture. Capture phase so a handler that calls
-  // `stopPropagation()` cannot swallow the event on its way up.
+  // Capture phase, so a handler calling `stopPropagation()` cannot swallow the
+  // event on its way up.
   useEffect(() => {
     if (!granted) return;
 
@@ -90,8 +87,7 @@ export function SiteAnalytics() {
     };
   }, [granted]);
 
-  // How the footer button reaches this component without prop-drilling a
-  // callback through two server components.
+  // How the footer button reaches this component — see `CookiePreferencesButton`.
   useEffect(() => {
     const open = () => setPreferencesOpen(true);
     window.addEventListener(OPEN_PREFERENCES_EVENT, open);
@@ -100,10 +96,7 @@ export function SiteAnalytics() {
     };
   }, []);
 
-  /**
-   * Persist first, then apply: a crash mid-apply must still leave the decision
-   * remembered, or the banner re-prompts someone who already answered.
-   */
+  /** Persist BEFORE applying: a crash mid-apply must not lose the decision. */
   const decide = useCallback((analyticsGranted: boolean) => {
     const next: ConsentChoice = {
       analyticsGranted,
@@ -113,8 +106,8 @@ export function SiteAnalytics() {
     writeConsent(next);
     setConsent({ choice: next });
     setAnalyticsConsent(analyticsGranted);
-    // Only on a grant. Reporting a refusal to the tool being refused would be
-    // both contradictory and, at that moment, switched off anyway.
+    // Only on a grant: reporting a refusal to the tool being refused is both
+    // contradictory and, at that moment, switched off anyway.
     if (analyticsGranted) {
       trackEvent("cookie_consent_updated", { analytics_granted: 1 });
     }
@@ -134,10 +127,7 @@ export function SiteAnalytics() {
           onAcceptAll={() => decide(true)}
         />
       ) : null}
-      {/*
-        Mounted only while open, so the dialog seeds its toggle from the current
-        choice each time and no closed <dialog> sits in the markup.
-      */}
+      {/* Conditional on purpose — see the note in `CookiePreferences`. */}
       {preferencesOpen ? (
         <CookiePreferences
           initialAnalyticsGranted={granted}

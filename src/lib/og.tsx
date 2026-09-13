@@ -1,19 +1,17 @@
 /**
  * Shared layout for the Open Graph link-preview cards.
  *
- * These render through Satori (inside `next/og`'s `ImageResponse`), which is
- * *not* a browser. Three constraints follow, and breaking any of them fails the
- * build with an opaque message:
+ * Rendered by Satori (inside `next/og`'s `ImageResponse`), which is NOT a
+ * browser. Breaking any of these fails the build with an opaque message:
  *
- * - Only flexbox. No grid, no float, no `position: absolute` tricks.
+ * - Flexbox only. No grid, no float, no absolute positioning.
  * - Any element with more than one child needs an explicit `display: "flex"`.
- * - Inline styles only — Tailwind classes and the tokens in `globals.css` mean
- *   nothing here, so the palette below is duplicated from that file by
- *   necessity. Keep the two in step by hand.
+ * - Inline styles only. Tailwind classes and the `globals.css` tokens do
+ *   nothing here, so the palettes below duplicate that file. Keep them in step
+ *   by hand.
  *
- * Deliberately no `<img>`: the studio mark is an SVG, which Satori handles
- * poorly, and fetching it from the CDN would put a network round-trip on the
- * critical path of every build. A typographic card has neither problem.
+ * No `<img>` on purpose: Satori handles SVG poorly, and fetching from the CDN
+ * would put a network round-trip in every build.
  */
 
 /** The 1.91:1 frame every major unfurler crops to. */
@@ -23,7 +21,7 @@ export const OG_CONTENT_TYPE = "image/png";
 
 export interface OgPalette {
   background: string;
-  /** Thick bar down the leading edge — the strongest brand signal at thumbnail size. */
+  /** Thick bar down the leading edge. */
   accent: string;
   title: string;
   tagline: string;

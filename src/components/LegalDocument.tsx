@@ -3,13 +3,11 @@ import type { Block, Inline, LegalDocument } from "@/lib/legal";
 /**
  * Renders a parsed legal document.
  *
- * Deliberately not a generic markdown renderer — it handles exactly the block
- * and inline kinds `lib/legal.ts` can produce, so the union is exhaustive and
- * a new construct upstream is a type error here rather than a silent omission.
+ * NOT a generic markdown renderer. It handles exactly the kinds `lib/legal.ts`
+ * produces, so the union stays exhaustive and a new construct upstream is a
+ * type error here rather than a silent omission.
  *
- * Every `##` gets a slug `id`, which is what makes a specific clause citable —
- * support replies and store reviewers both tend to link to one section rather
- * than the whole policy.
+ * Every `##` gets a slug `id` so a single clause can be linked to.
  */
 
 interface LegalDocumentProps {

@@ -10,22 +10,19 @@ interface CookiePreferencesProps {
 }
 
 /**
- * The per-category "Customize" layer, reached from the banner and from the
- * footer's Cookie Preferences link.
+ * The per-category "Customize" layer, reached from the banner and the footer.
  *
- * Essential storage is shown as an always-on, disabled toggle; analytics is the
- * one real choice. Transcribed from `showCookiePreferencesDialog` in the app,
- * with the essential row's wording adjusted for a site that has no sign-in and
- * no offline data.
+ * Essential storage is an always-on disabled toggle; analytics is the one real
+ * choice. Transcribed from `showCookiePreferencesDialog` in the app, with the
+ * essential row reworded for a site with no sign-in and no offline data.
  *
- * A native `<dialog>` driven by a ref, rather than a new dependency: it brings
- * the backdrop, the focus trap and Escape-to-close for free, and `onClose`
- * catches every route out — including Escape, which never reaches the buttons.
+ * A native `<dialog>` driven by a ref rather than a dependency: it brings the
+ * backdrop, focus trap and Escape-to-close for free, and `onClose` catches
+ * every route out, including Escape, which never reaches the buttons.
  *
- * Mounted only while it is open (`SiteAnalytics` renders it conditionally), so
- * the toggle below is seeded from the stored choice on every opening rather than
- * being re-synchronised in an effect — a cancelled toggle cannot linger, because
- * there is nothing left to linger in.
+ * MOUNTED ONLY WHILE OPEN (`SiteAnalytics` renders it conditionally), so the
+ * toggle seeds from the stored choice each time instead of needing to be
+ * re-synchronised in an effect. A cancelled toggle cannot linger.
  */
 export function CookiePreferences({
   initialAnalyticsGranted,
@@ -35,9 +32,8 @@ export function CookiePreferences({
   const ref = useRef<HTMLDialogElement>(null);
   const [analytics, setAnalytics] = useState(initialAnalyticsGranted);
 
-  // Opens the dialog once, on mount. No cleanup: removing an open <dialog> from
-  // the document pops it off the top layer, which is exactly what unmounting
-  // does here.
+  // No cleanup needed: removing an open <dialog> from the document pops it off
+  // the top layer, which is what unmounting does here.
   useEffect(() => {
     ref.current?.showModal();
   }, []);
@@ -79,10 +75,7 @@ export function CookiePreferences({
   );
 }
 
-/**
- * One cookie category. Omitting `onChange` renders the locked-on Essential row,
- * which is stated rather than offered.
- */
+/** One category. Omitting `onChange` renders the locked-on Essential row. */
 function CategoryRow({
   title,
   description,

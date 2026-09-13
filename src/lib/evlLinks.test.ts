@@ -3,12 +3,8 @@ import { evlLinks, evlLinksExcept } from "@/lib/evlLinks";
 import { currentRulebook } from "@/lib/rulebooks";
 
 /**
- * Guards the one list both Team EvL link renderings read.
- *
- * The page shows these destinations twice — the nav that closes it and the side
- * drawer behind the pull tab — so an entry that is wrong is wrong in two places
- * at once, and a destination added to only one of them is the bug this module
- * exists to make impossible.
+ * Guards the one list both Team EvL link renderings read. The page shows these
+ * destinations twice, so a wrong entry is wrong in two places at once.
  */
 
 describe("evlLinks", () => {

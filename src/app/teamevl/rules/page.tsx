@@ -12,19 +12,13 @@ export const metadata: Metadata = {
 };
 
 /**
- * Every edition of the rules, newest first.
+ * Every edition of the rules, so someone holding an older printing can find the
+ * rulebook that matches their box.
  *
- * This exists because a printed game outlives its rulebook: someone at a table
- * with the first Game Crafter box needs the rules that match it, not the ones
- * currently selling. The Linktree used to answer that with a Google Drive
- * folder, which interstitials the download and can ask a stranger to sign in —
- * these are the studio's own copies, on the studio's own CDN.
- *
- * The list itself, its order, and which edition is current all come from
+ * The list, its order and which edition is current all come from
  * `lib/rulebooks.ts`; this file only lays them out.
  *
- * An `<ol>` rather than a `<div>` stack: the sequence is the information, and a
- * screen reader should announce it as the ordered list it is.
+ * An `<ol>` rather than a `<div>` stack: the sequence is the information.
  */
 export default function Page() {
   return (
@@ -46,14 +40,10 @@ export default function Page() {
 }
 
 /**
- * One edition: what it is called, who it is for, and the download.
+ * One edition. `current` is PASSED rather than recomputed, so the badge cannot
+ * disagree with the position on the page.
  *
- * `current` is passed rather than recomputed so the badge cannot disagree with
- * the position on the page — the top row is the current edition by definition
- * (see `currentRulebook`).
- *
- * The PDF is off-site (the studio's CDN, not this export), so it is a plain
- * anchor opening in a new tab, the same as the rulebook button on /teamevl.
+ * The PDF is off-site, so it is a plain anchor rather than a `Link`.
  */
 function RulebookCard({ book, current }: { book: Rulebook; current: boolean }) {
   return (
@@ -69,14 +59,13 @@ function RulebookCard({ book, current }: { book: Rulebook; current: boolean }) {
             </span>
           ) : null}
         </div>
-        {/* Dropped rather than rendered empty — a blank `<p>` still takes a
-            line's height, which reads as a gap under the title. */}
+        {/* Dropped, not rendered empty: a blank `<p>` still takes line height. */}
         {book.note === "" ? null : <p className="text-subtle">{book.note}</p>}
       </div>
       {/*
-        The class goes on the `Button`, not the anchor: it is merged through
-        `cn()`/tailwind-merge there, so `h-11` actually replaces the size
-        variant's height instead of racing it in the stylesheet.
+        The class goes on `Button`, NOT the anchor: tailwind-merge runs through
+        `cn()` there, so `h-11` replaces the size variant's height instead of
+        racing it in the stylesheet.
       */}
       <Button
         asChild
@@ -91,10 +80,9 @@ function RulebookCard({ book, current }: { book: Rulebook; current: boolean }) {
           data-analytics-id={`download-rules-${book.version}`}
         >
           {/*
-            Every row's button reads "Download PDF", which is no use to someone
-            listing the links out of context — the edition is announced first
-            and shown to nobody. `data-analytics-id` does the same job for the
-            analytics reports, which would otherwise get one anonymous count.
+            Every row's button reads "Download PDF", useless to someone listing
+            links out of context. The sr-only span names the edition for
+            assistive tech; `data-analytics-id` does the same for the reports.
           */}
           <span className="sr-only">{book.title} rules — </span>
           Download PDF

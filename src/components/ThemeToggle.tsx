@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 /**
  * Light/dark switch.
  *
- * Both icons are always rendered and swapped by the `dark:` variant, so the
- * server and client markup are identical — no hydration mismatch, and no
- * mounted-flag effect. `resolvedTheme` is only read inside the click handler,
- * which by definition runs after hydration.
+ * Both icons are always rendered and swapped by the `dark:` variant, so server
+ * and client markup are identical: no hydration mismatch, no mounted flag.
+ * `resolvedTheme` is read only inside the click handler, which runs after
+ * hydration by definition.
  */
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();

@@ -1,19 +1,12 @@
 import { FallbackImage } from "@/components/FallbackImage";
 
 /**
- * A Team EvL row illustration.
+ * A Team EvL row illustration. Sized to match `FeatureArt` so both product
+ * pages lay out identically.
  *
- * Every one of these is now on the CDN, so in practice no row draws its
- * stand-in. It stays a client component all the same: the art host serves a
- * catch-all rewrite, so a filename typo comes back `200 text/html` rather than
- * a 404 and only the browser can tell — see `FallbackImage`. That is why this
- * cannot be `FeatureArt`, which is a server component with no failure path.
- *
- * The stand-in text differs per row because each one is standing in for a
- * different picture.
- *
- * Sizing matches `FeatureArt` so the Team EvL rows and the Habi Sloth ones are
- * laid out identically.
+ * Cannot be `FeatureArt`: that is a server component with no failure path, and
+ * a filename typo here returns `200 text/html` rather than a 404, which only
+ * the browser can detect. See `FallbackImage`.
  */
 export function EvlArt({
   src,
@@ -30,9 +23,8 @@ export function EvlArt({
   /** Describes the picture this row is missing. */
   fallback: string;
   /**
-   * Overrides the look of the art itself, not of the stand-in. The default
-   * suits a transparent illustration sitting straight on the page; art with its
-   * own opaque edges wants a corner radius the drawn rows must not get.
+   * Styles the art, not the stand-in. The default suits a transparent
+   * illustration; opaque art wants a corner radius the drawn rows must not get.
    */
   className?: string;
 }) {

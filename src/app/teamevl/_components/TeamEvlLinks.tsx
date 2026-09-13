@@ -3,11 +3,8 @@ import type { Route } from "next";
 import { evlLinksExcept } from "@/lib/evlLinks";
 
 /**
- * The Team EvL destinations, laid out as the nav that closes a page.
- *
- * The list itself lives in `lib/evlLinks.ts`, because the side drawer on
- * /teamevl renders the same destinations — this file is only the footer
- * arrangement of them.
+ * The Team EvL destinations as the nav that closes a page. The list lives in
+ * `lib/evlLinks.ts`, since `EvlLinkDrawer` renders the same entries.
  */
 
 interface TeamEvlLinksProps {

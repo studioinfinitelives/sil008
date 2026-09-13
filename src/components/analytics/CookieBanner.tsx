@@ -10,20 +10,19 @@ interface CookieBannerProps {
 }
 
 /**
- * Bottom-anchored consent banner, shown until the visitor makes a choice.
+ * Bottom-anchored consent banner, shown until the visitor chooses.
  *
- * "Essential only" and "Accept all" carry equal visual weight — refusing has to
- * be exactly as easy as accepting, so neither is styled as the obvious answer.
- * "Customize" opens the per-category layer. The copy is transcribed from the
- * Habi Sloth app's shipped banner (`sil_common/lib/elements/cookie_consent_banner.dart`)
- * so the two properties read alike; it is not to be reworded here.
+ * "Essential only" and "Accept all" carry EQUAL visual weight: refusing must be
+ * exactly as easy as accepting, so neither may be styled as the obvious answer.
  *
- * A `region`, not a `dialog`: it does not trap focus, because it does not block
- * the page. Semantic tokens only, since it floats over every section and has to
- * re-colour with whichever brand is underneath it.
+ * The copy is transcribed from the app's shipped banner
+ * (`sil_common/lib/elements/cookie_consent_banner.dart`). Do not reword it here.
  *
- * `data-analytics="off"` keeps the banner's own buttons out of the reports —
- * clicking "Essential only" must never itself be an analytics event.
+ * A `region`, not a `dialog`: it does not block the page, so it must not trap
+ * focus. Semantic tokens only, since it floats over every brand.
+ *
+ * `data-analytics="off"` keeps its own buttons out of the reports — clicking
+ * "Essential only" must never itself be an analytics event.
  */
 export function CookieBanner({
   onCustomize,

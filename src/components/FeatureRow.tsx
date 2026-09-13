@@ -3,16 +3,12 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * One alternating feature row: a short written bite on one side, something to
- * look at or play with on the other.
+ * One alternating feature row: copy on one side, media on the other. Collapses
+ * to a stacked column on narrow screens.
  *
- * The copy is deliberately small — a heading of a few words and a sentence or
- * two — because the media is doing the explaining. Rows alternate sides down
- * the page, and collapse to a single stacked column on narrow screens.
- *
- * The text always comes first in the DOM and is moved with `order` on wide
- * screens only, so the reading order stays heading-then-media for a screen
- * reader and a crawler regardless of which side it is painted on.
+ * The text is always FIRST in the DOM and moved with `order` on wide screens
+ * only, so reading order stays heading-then-media for a screen reader and a
+ * crawler whichever side it paints on.
  */
 
 interface FeatureRowProps {
@@ -50,17 +46,11 @@ export function FeatureRow({
 }
 
 /**
- * An illustration from the product's own CDN.
+ * A transparent-PNG illustration, sitting directly on the page with no panel.
  *
- * Every one of these is a transparent PNG, so it sits directly on the page with
- * no panel behind it — a filled card would put a hard edge around art that was
- * drawn to have none.
- *
- * `next/image` is unoptimized site-wide (there is no optimizer in a static
- * export), so width and height are load-bearing: without them the browser has
- * no aspect ratio to reserve and the row jumps as the art arrives. They are the
- * files' true pixel dimensions — a guessed ratio reserves the wrong box and
- * shifts the row anyway.
+ * Width and height are load-bearing: `next/image` is unoptimized site-wide, so
+ * they are the only thing reserving the box. They must be the file's true
+ * pixels — a guessed ratio shifts the row as the art arrives.
  */
 export function FeatureArt({
   src,

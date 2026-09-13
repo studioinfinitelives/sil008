@@ -25,15 +25,10 @@ export const metadata: Metadata = {
 };
 
 /**
- * The Habi Sloth product page.
+ * The Habi Sloth product page: alternating feature rows of copy and art.
  *
- * Laid out as alternating feature rows with a lot of air between them: a short
- * written bite on one side, and on the other either the app's own art or a shot
- * of the running app. The wheel row is the page's argument, so it comes first.
- *
- * The wheel is shown as a screenshot rather than rebuilt in the browser. A
- * recreation has to be kept in step with the app by hand and is wrong the
- * moment the app moves; a capture is simply what the app looks like.
+ * The wheel is a SCREENSHOT, not a browser recreation. A recreation has to be
+ * kept in step with the app by hand and is wrong the moment the app moves.
  */
 export default function Page() {
   return (
@@ -54,8 +49,8 @@ export default function Page() {
           className="mt-2 h-13 rounded-full px-8 text-base font-bold tracking-wide uppercase"
         >
           {/*
-            Both calls to action read "Get Habi Sloth", so the derived analytics
-            label cannot tell them apart — `data-analytics-id` names which one.
+            Both calls to action read "Get Habi Sloth", so the derived label
+            cannot tell them apart. `data-analytics-id` names which is which.
           */}
           <a href={APP_URL} data-analytics-id="get-habisloth-hero">
             Get Habi Sloth

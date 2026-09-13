@@ -12,11 +12,8 @@ export const metadata: Metadata = {
 };
 
 /**
- * The canonical privacy-policy URL.
- *
- * App Store and Play Store listings should point here directly rather than at
- * a redirect. The body is fetched from habisloth.app at build time so it can
- * never drift from what the app itself shows — see `lib/legal.ts`.
+ * The canonical privacy-policy URL. Store listings point here directly, not at
+ * a redirect. Body fetched from habisloth.app at build — see `lib/legal.ts`.
  */
 export default async function Page() {
   const document = await loadLegalDocument("privacy");

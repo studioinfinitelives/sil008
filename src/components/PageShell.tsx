@@ -10,10 +10,8 @@ interface PageShellProps {
 }
 
 /**
- * The common page frame: centred measure, section eyebrow, title, body.
- *
- * Styled only through the semantic tokens in globals.css, so a page renders in
- * whichever brand its route subtree is scoped to.
+ * The common page frame. Styled only through the semantic tokens in
+ * globals.css, so it renders in whichever brand its route subtree is scoped to.
  */
 export function PageShell({ eyebrow, title, lede, children }: PageShellProps) {
   return (

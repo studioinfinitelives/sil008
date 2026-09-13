@@ -2,61 +2,50 @@ import { expireAnalyticsCookies } from "@/lib/consent";
 import { GA_MEASUREMENT_ID } from "@/lib/site";
 
 /**
- * The one place gtag.js is touched.
+ * The only place gtag.js is touched.
  *
- * Strict opt-in: nothing is fetched from googletagmanager.com, no `dataLayer`
- * exists and no cookie is written until {@link setAnalyticsConsent} is called
- * with `true`. That is why this is hand-rolled rather than `next/script` or
- * `@next/third-parties` — both put the tag in the page before anyone has
- * agreed to it, which is the exact thing the consent gate exists to prevent.
+ * Hand-rolled rather than `next/script` or `@next/third-parties`: both inject
+ * the tag before consent is given, which defeats the gate. Nothing is fetched,
+ * no `dataLayer` exists and no cookie is written until `setAnalyticsConsent` is
+ * called with `true`.
  *
- * With an empty {@link GA_MEASUREMENT_ID} every function here is a no-op and
- * `SiteAnalytics` renders nothing, so the site behaves as if this file did not
- * exist.
+ * With an empty `GA_MEASUREMENT_ID` every function is a no-op.
  */
 
 declare global {
   interface Window {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
-    /** GA's documented kill switch — see {@link setAnalyticsConsent}. */
+    /** GA's kill switch — see `setAnalyticsConsent`. */
     [key: `ga-disable-${string}`]: boolean | undefined;
   }
 }
 
-/** False when the site ships without a measurement ID: the whole feature is off. */
 export function isAnalyticsConfigured(): boolean {
   return GA_MEASUREMENT_ID !== "";
 }
 
-// Annotated so the template stays a template-literal type: `GA_MEASUREMENT_ID`
-// is a plain `string`, so without this the key would widen and stop matching the
-// `Window` index signature above.
+// Annotated to keep the template-literal type: `GA_MEASUREMENT_ID` is a plain
+// `string`, so without this the key widens and stops matching the index
+// signature above.
 const DISABLE_FLAG: `ga-disable-${string}` = `ga-disable-${GA_MEASUREMENT_ID}`;
 
 let loaded = false;
 
-/**
- * Injects gtag.js and puts it in its denied-by-default consent state.
- *
- * Idempotent — a second call after the visitor re-opens their preferences must
- * not add a second tag.
- */
+/** Injects gtag.js in its denied-by-default state. Idempotent. */
 function loadGtag(): void {
   if (loaded) return;
   loaded = true;
 
   window.dataLayer ??= [];
-  // The canonical Google shim, verbatim: a function declaration that pushes its
-  // own `arguments` object. An arrow pushing a rest array looks equivalent and
-  // is not — gtag.js reads the pushed values as an arguments-like object.
+  // Google's shim verbatim: a function declaration pushing its own `arguments`.
+  // An arrow pushing a rest array is NOT equivalent — gtag.js reads the pushed
+  // value as an arguments-like object.
   window.gtag = function gtag() {
     // eslint-disable-next-line prefer-rest-params
     window.dataLayer?.push(arguments);
   } as Window["gtag"];
 
-  // Denied before anything else runs, mirroring sil006/web/index.html. The ad
-  // signals are never granted anywhere in this codebase.
   window.gtag?.("consent", "default", {
     ad_storage: "denied",
     ad_user_data: "denied",
@@ -65,8 +54,7 @@ function loadGtag(): void {
   });
   window.gtag?.("js", new Date());
   // `send_page_view: false` is load-bearing: `config` otherwise fires its own
-  // page_view on load, and `trackPageView` fires one for the same landing page
-  // a moment later. The duplicate is invisible in DebugView unless looked for.
+  // page_view on load and `trackPageView` fires a second for the same page.
   window.gtag?.("config", GA_MEASUREMENT_ID, { send_page_view: false });
 
   const script = document.createElement("script");
@@ -76,15 +64,11 @@ function loadGtag(): void {
 }
 
 /**
- * Applies a consent decision.
+ * Applies a consent decision. Ad signals are never re-sent; they stay denied.
  *
- * On a grant the tag is loaded and `analytics_storage` flipped. Advertising
- * signals are deliberately *not* re-sent: they stay denied from the defaults.
- *
- * On a refusal, `window['ga-disable-<ID>'] = true` is what actually stops
- * collection. Consent Mode alone does not — with `analytics_storage: denied`
- * gtag.js still sends cookieless pings, and the disable flag is the documented
- * way to stop them.
+ * On refusal the `ga-disable-<ID>` flag is what actually stops collection.
+ * Consent Mode alone does not: with `analytics_storage: denied` gtag.js still
+ * sends cookieless pings.
  */
 export function setAnalyticsConsent(granted: boolean): void {
   if (!isAnalyticsConfigured()) return;
@@ -103,7 +87,7 @@ export function setAnalyticsConsent(granted: boolean): void {
   expireAnalyticsCookies();
 }
 
-/** Sends one GA4 event. A no-op until the tag has been loaded by a grant. */
+/** Sends one GA4 event. A no-op until a grant has loaded the tag. */
 export function trackEvent(
   name: string,
   params: Record<string, string | number | boolean>,
@@ -113,15 +97,12 @@ export function trackEvent(
 }
 
 /**
- * Sends a page view.
+ * Fired by hand for every route including the first, since `config` is
+ * configured not to send one and Next's client router never triggers another.
  *
- * Fired by hand for every route, including the first: `gtag('config')` sends
- * exactly one page_view on load and Next's client router never triggers
- * another, so without this only landing pages would ever be counted.
- *
- * `page_location` comes from `window.location.href` rather than being rebuilt
- * from the route — Hosting serves this export with `cleanUrls`, so the URL a
- * visitor is actually on is the only correct answer.
+ * `page_location` comes from `window.location.href` rather than the route:
+ * Hosting serves this export with `cleanUrls`, so the live URL is the only
+ * correct answer.
  */
 export function trackPageView(): void {
   trackEvent("page_view", {

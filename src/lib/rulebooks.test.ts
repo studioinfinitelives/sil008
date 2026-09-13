@@ -3,16 +3,12 @@ import { evlRules } from "@/lib/cdn";
 import { currentRulebook, rulebooks } from "@/lib/rulebooks";
 
 /**
- * Guards the rules archive's two promises.
+ * Two promises:
  *
- * **The order is newest first.** /teamevl/rules renders `rulebooks` in the
- * order it is declared, so the ordering has to be checked here rather than
- * trusted — appending a third edition at the bottom of the list would otherwise
- * quietly bury the current rules under an old printing.
- *
- * **Nothing published is missing from it.** A rulebook PDF on the CDN that no
- * page lists is a download nobody can find; `cdn.test.ts` proves every URL has
- * a file, and this proves every file has a row.
+ * 1. The order is newest first. /teamevl/rules renders `rulebooks` as declared,
+ *    so appending a third edition at the bottom would bury the current rules.
+ * 2. Nothing published is missing. `cdn.test.ts` proves every URL has a file;
+ *    this proves every file has a row.
  */
 
 describe("rulebooks", () => {

@@ -12,9 +12,9 @@ import {
 } from "@/lib/consent";
 
 /**
- * The consent module is where "opt-in" is actually decided, so its failure modes
- * matter more than its happy path: a malformed blob must re-prompt rather than
- * throw, and a withdrawal must reach every domain scope GA might have used.
+ * Failure modes matter more than the happy path here: a malformed blob must
+ * re-prompt rather than throw, and a withdrawal must reach every domain scope
+ * GA might have used.
  */
 
 const choice: ConsentChoice = {

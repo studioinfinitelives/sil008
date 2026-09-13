@@ -2,12 +2,8 @@ import Link from "next/link";
 import { PageShell } from "@/components/PageShell";
 
 /**
- * Branded 404.
- *
- * Under `output: "export"` this renders to `out/404.html`, which is the exact
- * filename Firebase Hosting serves for unmatched paths — so no hosting config
- * is needed to wire it up. Without this file that page is Next's unstyled
- * default, sitting outside the site's own typography and palette.
+ * Branded 404. Renders to `out/404.html`, the exact filename Firebase Hosting
+ * serves for unmatched paths, so no hosting config is needed to wire it up.
  */
 export default function NotFound() {
   return (

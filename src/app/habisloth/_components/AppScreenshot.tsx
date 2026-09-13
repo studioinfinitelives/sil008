@@ -1,16 +1,12 @@
 import { FallbackImage } from "@/components/FallbackImage";
 
 /**
- * A screenshot of the running app.
+ * A screenshot of the running app. Opaque and portrait, so unlike the
+ * illustrations it gets corners, a shadow, and a narrower cap.
  *
- * Unlike the illustrations this is a full opaque phone screen, so it gets
- * rounded corners and a shadow to read as a device rather than as a rectangle
- * dropped on the page. It is capped narrow because it is a tall portrait shot:
- * at the illustrations' width it would be twice the height of its own row.
- *
- * Missing screenshots are the normal case here while captures are still being
- * taken, so this goes through {@link FallbackImage} — which explains why a
- * client-side `error` event is the only way to notice one.
+ * Goes through `FallbackImage` because a missing screenshot is a normal state
+ * while captures are still being taken. See that file for why only the browser
+ * can detect one.
  */
 
 const FALLBACK_TEXT = "Picture a Beautiful wheel full of habits";

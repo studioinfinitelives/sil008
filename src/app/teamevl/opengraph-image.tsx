@@ -1,10 +1,7 @@
 import { ImageResponse } from "next/og";
 import { OG_CONTENT_TYPE, OG_SIZE, OgCard, teamEvlPalette } from "@/lib/og";
 
-/**
- * Team EvL's card. It takes the section's dark palette rather than the light
- * one — the game reads as violet-black wherever it is small.
- */
+/** Team EvL's card, in the section's dark palette. */
 
 // See the note in `app/opengraph-image.tsx` — required under `output: "export"`.
 export const dynamic = "force-static";

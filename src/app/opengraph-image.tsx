@@ -3,16 +3,13 @@ import { OG_CONTENT_TYPE, OG_SIZE, OgCard, studioPalette } from "@/lib/og";
 import { SITE_NAME } from "@/lib/site";
 
 /**
- * Default link-preview card for the whole site.
- *
- * Next resolves the nearest `opengraph-image` walking up the route tree, so
- * this covers every route that does not define its own — `/blog` and
- * `/blog/[slug]` included.
+ * Default link-preview card. Next resolves the nearest `opengraph-image` up the
+ * route tree, so this covers every route without its own.
  */
 
-// Required under `output: "export"`. An image route is a Route Handler, and
-// Next refuses to export one that has not declared itself static — without this
-// the build fails outright rather than silently omitting the PNG.
+// REQUIRED under `output: "export"`: an image route is a Route Handler, and
+// Next refuses to export one that has not declared itself static. Omitting this
+// fails the build rather than silently skipping the PNG.
 export const dynamic = "force-static";
 
 export const alt = SITE_NAME;

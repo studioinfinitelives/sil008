@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * The canonical terms URL. Body fetched from habisloth.app at build time so it
+ * The canonical terms URL. Body fetched from habisloth.app at build so it
  * matches the copy the app asks users to accept — see `lib/legal.ts`.
  */
 export default async function Page() {

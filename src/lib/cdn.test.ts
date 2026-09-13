@@ -15,29 +15,22 @@ import {
 } from "@/lib/cdn";
 
 /**
- * Guards the art this site publishes, in three parts.
+ * Guards the published art in three parts:
  *
- * **Every URL resolves to a committed file.** A constant naming a file that is
- * not in `cdn/` renders a written stand-in rather than throwing, so a typo is
- * invisible until someone looks at the page.
+ * 1. Every declared URL resolves to a committed file. A missing file renders a
+ *    written stand-in rather than throwing, so a typo is otherwise invisible.
+ * 2. Every declared size is the file's own, read back out of the headers.
+ *    `next/image` is unoptimized, so nothing at runtime contradicts a wrong
+ *    pair — the row just draws at the wrong shape.
+ * 3. Copies of the app's art have not drifted from `sil006/cdn/`.
  *
- * **Every declared size is the file's own.** `next/image` is unoptimized here,
- * so a width and height are pure layout reservation and nothing at runtime ever
- * contradicts them — a transposed pair just quietly draws the row at the wrong
- * shape. `sizeOf` reads the real numbers back out of the headers.
+ * Photographs come through `evlPhotos`, where their filenames are coined, and
+ * get the same first two checks.
  *
- * The carousel's photographs are reached through `evlPhotos` rather than
- * `lib/cdn.ts`, because that is where their filenames are coined — see the note
- * there. They are published from the same `cdn/` and get the same two checks.
- *
- * **The app's art has not drifted.** Five Habi Sloth images are byte-identical
- * copies of `sil006/cdn/`, not hotlinks (see `habiArt`), so a recrop upstream
- * has to be carried across by hand. This compares the files rather than the
- * published `ETag`s: the app's *repo* is the source of truth here, so drift
- * should fail as soon as sil006 changes, not only once it deploys. That is the
- * opposite of `legal.ts`, where what the app *serves* is what must be matched.
- *
- * Skips when `../sil006` is absent, mirroring sil006's own `make test-common`.
+ * The drift check compares files rather than published ETags, because the app's
+ * REPO is the source of truth here: drift should fail when sil006 changes, not
+ * when it deploys. The opposite of `legal.ts`, which must match what the app
+ * SERVES. Skipped when `../sil006` is absent.
  */
 
 const CDN_DIR = path.join(process.cwd(), "cdn");
@@ -55,16 +48,14 @@ const SHARED_WITH_APP = [
 const fileNameOf = (url: string) => new URL(url).pathname.slice(1);
 
 /**
- * A file's pixel size, read straight out of its header.
+ * A file's pixel size, read out of its header.
  *
- * Hand-rolled rather than taken from `sharp`: sharp is in `node_modules` as one
- * of Next's optional platform dependencies, not as anything this project
- * declares, so a test that imported it would break on whichever machine npm
- * decided not to install the binary for. The three formats `cdn/` holds each
- * put their dimensions within the first few bytes, and that is all this needs.
+ * Hand-rolled rather than using `sharp`: sharp is in `node_modules` only as one
+ * of Next's optional platform dependencies, so importing it would break on
+ * whichever machine npm skipped the binary for.
  *
- * The JPEGs carry no EXIF — the downscale baked any orientation into the pixels
- * — so a JPEG's frame header is also the size a browser draws it at.
+ * The JPEGs carry no EXIF (the downscale baked orientation into the pixels), so
+ * a frame header is also the size a browser draws it at.
  */
 function sizeOf(file: string): { width: number; height: number } {
   const bytes = readFileSync(file);
@@ -148,12 +139,10 @@ describe("published art", () => {
   });
 
   it("ships no file that nothing references, except known spares", () => {
-    // Held deliberately, referenced by nothing:
+    // Deliberately held, referenced by nothing. Deleting published art is a
+    // one-way door (immutable cache), which is why these stay:
     //   habi_wheel_shot.png      — for a page that does not exist yet.
-    //   site_card_comingsoon.png — superseded by site_card_pbnk.svg, which is
-    //     what `cardArt.comingSoon` actually points at. Kept because deleting
-    //     published art is a one-way door (immutable cache), not because it is
-    //     used. Drop it from cdn/ and from here together when you are sure.
+    //   site_card_comingsoon.png — superseded by site_card_pbnk.svg.
     // Anything else unreferenced is a dead upload or a forgotten constant.
     const referenced = new Set(declared.map(fileNameOf));
     const spares = new Set(["habi_wheel_shot.png", "site_card_comingsoon.png"]);
@@ -164,9 +153,6 @@ describe("published art", () => {
   });
 
   it("gives every Team EvL image the size it was actually uploaded at", () => {
-    // These numbers do nothing but reserve the box: `next/image` is unoptimized
-    // site-wide, so a wrong pair is invisible until the file lands and the row
-    // resizes underneath the reader. Read from the file rather than trusted.
     const sized = [...Object.values(evlArt), ...evlPhotos];
     for (const { src, width, height } of sized) {
       const file = path.join(CDN_DIR, fileNameOf(src));

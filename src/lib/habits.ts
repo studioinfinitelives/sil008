@@ -1,28 +1,22 @@
 /**
- * Shared habit math, ported from the Habi Sloth app's `lib/utils/habits.dart`.
+ * Habit math ported from the app's `lib/utils/habits.dart`.
  *
- * The Dart original is the source of truth: it is what the app ships and what
- * the Python backend mirrors. Nothing the site renders calls this today — the
- * demos it was ported for have been removed — but it is kept, with its test
- * suite mirroring `habits_test.dart`, as the checked reference any future
- * explainer of how goals and pace work should be built on rather than
- * re-derived. If this and the Dart ever disagree, this one is wrong.
+ * UNUSED BY THE SITE — the demos it was ported for were removed. Kept
+ * deliberately, with its test suite mirroring `habits_test.dart`, as the
+ * checked reference for any future explainer of goals and pace. Do not delete
+ * as dead code.
  *
- * Two substitutions were unavoidable in the crossing:
+ * The Dart original is the source of truth. If the two disagree, this is wrong.
  *
- * - **`Timestamp?` → `Date | null`.** The Dart signatures take a Firestore
- *   `Timestamp`. This site has no Firestore dependency (and no live data at
- *   all), so the equivalent plain `Date` stands in. `Timestamp.fromDate(d)` in
- *   a Dart caller is simply `d` here.
- * - **Dart `weekday` → {@link isoWeekday}.** Dart numbers weekdays 1=Mon…7=Sun.
- *   JavaScript's `Date.getDay()` numbers them 0=Sun…6=Sat. Every weekday value
- *   in this module is the *Dart* convention; `getDay()` is never used raw.
+ * Two substitutions in the port:
+ *
+ * - `Timestamp?` → `Date | null`. This site has no Firestore.
+ * - Dart `weekday` → `isoWeekday`. Dart is 1=Mon…7=Sun, `Date.getDay()` is
+ *   0=Sun…6=Sat. Every weekday here is the DART convention; `getDay()` is
+ *   never used raw.
  */
 
-/**
- * Upper clamp for any Suggested Daily Count — a sanity ceiling that should
- * never be hit in practice, kept in one place so every clamp agrees.
- */
+/** Sanity ceiling for any Suggested Daily Count, so every clamp agrees. */
 export const MAX_SUGGESTED_DAILY_COUNT = 20;
 
 /** ISO weekday numbers, matching Dart's `DateTime.monday`…`DateTime.sunday`. */
@@ -37,29 +31,23 @@ export const Weekday = {
 } as const;
 
 /**
- * The seven legal weekday values.
- *
- * Every `daysOfWeek` parameter in this module is typed as
- * `readonly WeekdayNumber[]` rather than `readonly number[]`, so a schedule
- * containing `0` or `9` cannot be constructed in the first place. Values
- * *derived* from a `Date` (see {@link isoWeekday}) stay plain `number` — they
- * are already constrained by arithmetic, and narrowing them would need a cast
- * that asserts what the Dart original simply guarantees.
+ * Every `daysOfWeek` parameter is typed with this rather than `number[]`, so a
+ * schedule containing 0 or 9 cannot be constructed. Values derived from a
+ * `Date` stay plain `number`: arithmetic already constrains them, and narrowing
+ * would need a cast.
  */
 export type WeekdayNumber = (typeof Weekday)[keyof typeof Weekday];
 
-// ── Small helpers that Dart provides in its standard library ─────────────────
+// ── Helpers Dart provides in its standard library ────────────────────────────
 
-/** Dart's `num.clamp(lower, upper)`, which TypeScript has no equivalent of. */
+/** Dart's `num.clamp`, which TypeScript has no equivalent of. */
 function clamp(value: number, lower: number, upper: number): number {
   return Math.min(Math.max(value, lower), upper);
 }
 
 /**
- * ISO weekday (1=Mon…7=Sun) — Dart's `DateTime.weekday`.
- *
- * `Date.getDay()` returns 0 for Sunday, so it cannot be used directly anywhere
- * a Dart `weekday` was expected.
+ * Dart's `DateTime.weekday` (1=Mon…7=Sun). `Date.getDay()` returns 0 for
+ * Sunday, so it cannot be used directly where a Dart weekday is expected.
  */
 export function isoWeekday(date: Date): number {
   const day = date.getDay();
@@ -74,14 +62,11 @@ function dateOnly(date: Date): Date {
 // ── Week boundary ────────────────────────────────────────────────────────────
 
 /**
- * Monday (ISO weekday 1) of the week containing `date`. Preserves `date`'s
- * time-of-day; pass a date-only value (or read only y/m/d from the result)
- * when a midnight boundary matters.
+ * Monday of the week containing `date`, preserving time-of-day.
  *
- * Note: Dart subtracts a `Duration`, which is absolute elapsed time and so can
- * shift the wall-clock hour across a DST boundary. This version does calendar
- * arithmetic on the date components, which preserves time-of-day exactly. The
- * two agree except in that DST edge case, where this one is the more correct.
+ * Diverges from Dart: it subtracts a `Duration`, which is absolute elapsed time
+ * and can shift the wall-clock hour across a DST boundary. This does calendar
+ * arithmetic instead. The two agree except in that edge case.
  */
 export function getWeekMonday(date: Date): Date {
   return new Date(
@@ -105,11 +90,9 @@ export interface FirstActiveWeekdayParams {
 }
 
 /**
- * Returns the ISO weekday (1=Mon…7=Sun) of the first active day in the week
- * starting at `weekMonday`, respecting when the habit was activated.
- *
- * Returns 1 (Monday) when `activatedAt` is null or falls before `weekMonday`,
- * meaning the full schedule is in play for this week.
+ * ISO weekday of the first active day in the week starting at `weekMonday`.
+ * Returns 1 when `activatedAt` is null or predates the week, meaning the full
+ * schedule is in play.
  */
 export function firstActiveWeekday({
   weekMonday,
@@ -141,11 +124,8 @@ export interface PaceDays {
 }
 
 /**
- * Computes the effective (perWeek, passed) active-day counts for pace
- * calculations, trimming days that fall before the habit's `activatedAt`
- * within the current week.
- *
- * Both returned values are ≥ 1, so either is safe to use as a divisor.
+ * Effective (perWeek, passed) active-day counts, trimming days before
+ * `activatedAt`. Both values are ≥ 1, so either is safe as a divisor.
  */
 export function computePaceDays({
   daysOfWeek,
@@ -176,15 +156,12 @@ export interface ExpectedPaceParams {
 }
 
 /**
- * Expected pace = target completions per active day = `goal / scheduled days`.
+ * `goal / scheduled days`. Uses the FULL schedule length, never trimmed by
+ * `activatedAt`.
  *
- * Uses the full schedule length (never trimmed by `activatedAt`), matching the
- * "Expected Pace" term in {@link computeInnerFillFraction} and
- * {@link computeStaticDailyCount}.
- *
- * In the app this value is stamped onto each activity at write time and read
- * back instead of being recomputed — so historical days keep the pace they were
- * created with even after the habit's goal or schedule changes.
+ * In the app this is stamped onto each activity at write time and read back
+ * rather than recomputed, so historical days keep the pace they were created
+ * with after a goal or schedule change.
  */
 export function computeExpectedPace({
   daysOfWeek,
@@ -201,12 +178,10 @@ export interface DayCompletionFractionParams {
 }
 
 /**
- * One day's completion fraction for a single habit: `count / expectedPace`.
+ * `count / expectedPace` — the calendar's per-day scoring.
  *
- * The canonical per-day scoring used by the calendar's monthly completion and
- * heatmap. A single day is scored against the full daily `expectedPace` and is
- * **uncapped** — an over-performing day can offset a weaker one; only the
- * averaged result should be clamped. Returns 0 when the pace is non-positive
+ * UNCAPPED: an over-performing day can offset a weaker one, so only the
+ * averaged result should be clamped. Returns 0 for a non-positive pace
  * (legacy/zero-goal docs).
  */
 export function computeDayCompletionFraction({
@@ -220,8 +195,8 @@ export function computeDayCompletionFraction({
 // ── Suggested Daily Count ────────────────────────────────────────────────────
 
 /**
- * Static (non-dynamic) SDC: a flat daily target, the same every active day,
- * that ignores missed days (no catch-up). Computed as `⌈goal / activeDays⌉`.
+ * Static Suggested Daily Count: `⌈goal / activeDays⌉`. A flat target, the same
+ * every active day, with no catch-up for missed days.
  */
 export function computeStaticDailyCount({
   daysOfWeek,
@@ -238,32 +213,19 @@ export function computeStaticDailyCount({
 
 export interface InnerFillFractionParams {
   weekCount: number;
-  /**
-   * The activity's stored expected pace, falling back to
-   * {@link computeExpectedPace} for legacy docs.
-   */
+  /** The activity's stored pace, or `computeExpectedPace` for legacy docs. */
   expectedPace: number;
-  /**
-   * Active days elapsed this week — take {@link computePaceDays}'s `passed`,
-   * which correctly trims days before `activatedAt`.
-   */
+  /** Take `computePaceDays`'s `passed`, which trims days before activation. */
   activeDaysPassedSafe: number;
-  /**
-   * For 2-person coop: each user is responsible for half the goal, so the
-   * result is doubled before clamping.
-   */
+  /** 2-person coop: each user owes half the goal, so the result is doubled. */
   coopHalf?: boolean;
 }
 
 /**
- * Computes the inner-fill fraction (0.0–1.0) for a habit wheel button,
- * representing "Is the user on pace?"
+ * Wheel button inner fill, 0.0–1.0 — "is the user on pace?"
  *
  * ```
- * Expected Pace = goal / totalScheduleDays   (stamped per activity)
- * Actual Pace   = weekCount / activeDaysPassedSafe
- * fill          = Actual Pace / Expected Pace
- *               = weekCount / (activeDaysPassedSafe × expectedPace)
+ * fill = weekCount / (activeDaysPassedSafe × expectedPace)
  * ```
  */
 export function computeInnerFillFraction({
@@ -279,14 +241,10 @@ export function computeInnerFillFraction({
 }
 
 /**
- * True when the habit is on pace for the week — i.e. the wheel button's inner
- * fill reads full. Deliberately a one-line delegation to
- * {@link computeInnerFillFraction} so "hidden by the wheel's hide-on-pace
- * toggle" and "the button the user last saw was full" can never drift apart.
- *
- * A non-positive `expectedPace` (a doc written before the field was stamped) is
- * handled by {@link computeInnerFillFraction}'s divisor guard, not re-handled
- * here — same input, same answer as the button.
+ * True when the wheel button's inner fill reads full. A one-line delegation on
+ * purpose, so "hidden by the hide-on-pace toggle" and "the button looked full"
+ * cannot drift apart. A non-positive `expectedPace` is handled by the divisor
+ * guard in `computeInnerFillFraction`, not re-handled here.
  */
 export function isOnPaceForWeek(params: InnerFillFractionParams): boolean {
   return computeInnerFillFraction(params) >= 1;

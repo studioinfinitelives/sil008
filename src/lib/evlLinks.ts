@@ -4,25 +4,12 @@ import { currentRulebook } from "@/lib/rulebooks";
 /**
  * Everything the Team EvL Linktree points at.
  *
- * The page is written to replace that Linktree, so it carries all of its
- * destinations rather than a store link alone — once this is live the Linktree
- * can be reduced to a single link back here.
+ * RENDERED TWICE on /teamevl: as `TeamEvlLinks` at the foot of the page and in
+ * the pull-tab drawer. The list lives here so the two cannot drift — a new
+ * destination is one entry below and appears in both.
  *
- * This list is rendered twice on /teamevl: once as the nav that closes the page
- * ({@link "@/app/teamevl/_components/TeamEvlLinks"}) and once in the side
- * drawer the pull tab opens. It lives here rather than in either component so
- * the two cannot drift — a new destination is one entry below and shows up in
- * both, the way a new printing is one entry in `rulebooks`.
- *
- * Both rulebook entries used to be Google Drive links. They now point at the
- * studio's own copies: the archive is a page here, and the current rules are
- * the PDF on the studio CDN that every "Download Rules" button already serves.
- * Drive interstitials a download and can ask a stranger to sign in — see the
- * note on `evlRules`.
- *
- * The rest are genuinely off-site, so they stay plain anchors. Internal
- * destinations are typed as `Route`, which with `typedRoutes` on means a typo
- * fails `tsc` rather than shipping a dead link.
+ * `Route` on internal destinations means `typedRoutes` fails `tsc` on a typo
+ * rather than shipping a dead link.
  */
 export type EvlLink =
   | { kind: "route"; href: Route; label: string }
@@ -53,12 +40,7 @@ export const evlLinks: readonly EvlLink[] = [
   { kind: "external", href: "https://discord.gg/zrSg2CfKGS", label: "Discord" },
 ];
 
-/**
- * The list minus the page currently being rendered, if it is in the list.
- *
- * A link to the page you are already on is noise, so /teamevl/rules drops its
- * own entry. Passing nothing keeps every destination.
- */
+/** The list minus the page being rendered. Passing nothing keeps every entry. */
 export function evlLinksExcept(omit?: Route): readonly EvlLink[] {
   return omit ? evlLinks.filter((item) => item.href !== omit) : evlLinks;
 }

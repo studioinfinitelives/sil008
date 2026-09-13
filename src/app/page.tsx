@@ -4,12 +4,8 @@ import { ProjectCard } from "@/app/_components/ProjectCard";
 import { cardArt, logoUrl } from "@/lib/cdn";
 
 /**
- * The studio hub.
- *
- * Reproduces the layout of the Flutter site this replaces — logo, wordmark,
- * "Our Creations", three circular cards, reveal-on-click contact — but as
- * static HTML with the content in the markup, which is the entire point of the
- * rebuild. Fuller copy is plan §3.
+ * The studio hub. Reproduces the layout of the Flutter site this replaces, but
+ * as static HTML with the content in the markup.
  */
 export default function Page() {
   return (

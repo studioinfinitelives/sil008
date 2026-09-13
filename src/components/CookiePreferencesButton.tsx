@@ -4,15 +4,14 @@ import { OPEN_PREFERENCES_EVENT } from "@/components/analytics/SiteAnalytics";
 import { isAnalyticsConfigured } from "@/lib/analytics";
 
 /**
- * The footer's way of re-opening the cookie preferences dialog.
+ * Re-opens the cookie preferences dialog from the footer.
  *
  * A window event rather than a callback: the dialog's state lives in
- * `SiteAnalytics`, which sits beside `SiteFooter` in the root layout rather than
- * above it, and shouting is cheaper than prop-drilling a handler through two
- * server components — which would have to become client components to carry it.
+ * `SiteAnalytics`, a SIBLING of `SiteFooter` in the root layout, not an
+ * ancestor. Prop-drilling would force two server components to become client
+ * components.
  *
- * Renders nothing when the site ships without a measurement ID: a button
- * offering to configure cookies that do not exist is worse than no button.
+ * Renders nothing without a measurement ID.
  */
 export function CookiePreferencesButton() {
   if (!isAnalyticsConfigured()) return null;
