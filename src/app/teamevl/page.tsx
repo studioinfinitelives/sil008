@@ -1,22 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { EvlArt } from "@/app/teamevl/_components/EvlArt";
+import { EvlBloomsFlourish } from "@/app/teamevl/_components/EvlBloomsFlourish";
+import { EvlCallToAction } from "@/app/teamevl/_components/EvlCallToAction";
 import { EvlLinkDrawer } from "@/app/teamevl/_components/EvlLinkDrawer";
 import { EvlPhotoCarousel } from "@/app/teamevl/_components/EvlPhotoCarousel";
 import { FeatureRow } from "@/components/FeatureRow";
-import { Button } from "@/components/ui/button";
-import {
-  EVL_BLOOMS_HEIGHT,
-  EVL_BLOOMS_WIDTH,
-  evlArt,
-  evlBlooms,
-} from "@/lib/cdn";
-import { currentRulebook } from "@/lib/rulebooks";
+import { evlArt } from "@/lib/cdn";
 
 const DESCRIPTION =
   "The UNcooperative card game of bluffing, social deduction, and general evil.";
-
-const BUY_URL = "https://www.thegamecrafter.com/games/team-evl";
 
 export const metadata: Metadata = {
   title: "Team EvL",
@@ -41,73 +34,6 @@ export const metadata: Metadata = {
  * Sizes come with the URLs from `lib/cdn.ts` rather than being written here,
  * because they must match the uploaded file — see that file.
  */
-
-/** Shared by both calls to action, so the pair cannot drift apart. */
-const CTA_BUTTON =
-  "h-13 rounded-full px-8 text-base font-bold tracking-wide uppercase";
-
-/**
- * Buy button with the rulebook beside it.
- *
- * Resolves whichever edition is current, so a new printing changes
- * `lib/rulebooks.ts` and nothing else. The PDF is off-site, hence a plain
- * anchor in a new tab rather than a `Link`.
- *
- * `area` is REQUIRED, not optional: both calls to action render the same two
- * button labels, so without it the reports cannot tell top from bottom.
- */
-function CallToAction({
-  area,
-  className,
-}: {
-  area: string;
-  className?: string;
-}) {
-  return (
-    <div
-      data-analytics-area={area}
-      className={`flex flex-wrap items-center justify-center gap-3 ${className ?? ""}`}
-    >
-      <Button asChild size="lg" className={CTA_BUTTON}>
-        <a href={BUY_URL}>Buy Team EvL</a>
-      </Button>
-      <Button asChild size="lg" variant="outline" className={CTA_BUTTON}>
-        <a href={currentRulebook.url} target="_blank" rel="noreferrer">
-          Download Rules
-        </a>
-      </Button>
-    </div>
-  );
-}
-
-/**
- * Decorative closing flourish. `alt=""` keeps it out of the accessibility tree.
- *
- * BOTH files render and the `dark:` variant hides one, as `ThemeToggle` does
- * with its icons. A single `<Image>` switching `src` on theme cannot work: a
- * static export is written before the theme is known, and choosing in the
- * browser flashes the wrong ink on first paint.
- */
-function BloomsFlourish() {
-  const size = { width: EVL_BLOOMS_WIDTH, height: EVL_BLOOMS_HEIGHT };
-  const shared = "mx-auto mt-10 -mb-20 h-auto w-full max-w-6xl";
-  return (
-    <>
-      <Image
-        src={evlBlooms.onLight}
-        alt=""
-        {...size}
-        className={`${shared} dark:hidden`}
-      />
-      <Image
-        src={evlBlooms.onDark}
-        alt=""
-        {...size}
-        className={`${shared} hidden dark:block`}
-      />
-    </>
-  );
-}
 
 export default function Page() {
   return (
@@ -156,7 +82,7 @@ export default function Page() {
             priority
           />
         </div>
-        <CallToAction area="hero" />
+        <EvlCallToAction area="hero" />
       </section>
 
       <div className="mx-auto max-w-6xl px-5">
@@ -277,11 +203,11 @@ export default function Page() {
             className="max-w-3xl rounded-2xl"
           />
         </div>
-        <CallToAction area="closing" className="mb-10" />
+        <EvlCallToAction area="closing" className="mb-10" />
         <h2 className="text-ink text-3xl font-black tracking-tight text-balance sm:text-4xl">
           Only the most EvL can win.
         </h2>
-        <BloomsFlourish />
+        <EvlBloomsFlourish />
       </section>
     </main>
   );

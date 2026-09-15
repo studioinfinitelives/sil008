@@ -82,11 +82,26 @@ export const evlArt = {
     height: 896,
   },
   /**
-   * The site's only animation. Ships exactly as delivered at 3.2 MB: a GIF
-   * cannot be resampled without re-encoding all 110 frames. A smaller cut would
-   * be a new filename.
+   * GIFs ship exactly as delivered: one cannot be resampled without re-encoding
+   * every frame. A smaller cut would be a new filename.
    */
   players: { src: cdnUrl("evl_2to5_players.gif"), width: 870, height: 490 },
+  /** /teamevl/howtoplay. */
+  playersBanner: {
+    src: cdnUrl("evl_howtoplay_players_banner.webp"),
+    width: 3000,
+    height: 666,
+  },
+  yourTurn: {
+    src: cdnUrl("evl_howtoplay_your_turn.jpg"),
+    width: 2048,
+    height: 1152,
+  },
+  howToWin: { src: cdnUrl("evl_howtoplay_win.gif"), width: 1000, height: 600 },
+  play: { src: cdnUrl("evl_howtoplay_play.gif"), width: 1000, height: 400 },
+  peek: { src: cdnUrl("evl_howtoplay_peek.gif"), width: 1000, height: 400 },
+  draw: { src: cdnUrl("evl_howtoplay_draw.gif"), width: 1000, height: 400 },
+  heal: { src: cdnUrl("evl_howtoplay_heal.gif"), width: 1000, height: 400 },
 } as const;
 
 /** The game's own mark. Currently unrendered; `cardArt.teamevl` is the hub card. */

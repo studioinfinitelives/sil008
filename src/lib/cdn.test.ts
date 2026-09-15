@@ -65,10 +65,21 @@ function sizeOf(file: string): { width: number; height: number } {
     return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
   }
 
-  // GIF: "GIF89a", then the logical screen descriptor — little-endian, alone
-  // among the three.
+  // GIF: "GIF89a", then the logical screen descriptor — little-endian, unlike
+  // PNG and JPEG.
   if (bytes.subarray(0, 3).toString() === "GIF") {
     return { width: bytes.readUInt16LE(6), height: bytes.readUInt16LE(8) };
+  }
+
+  // WebP: ONLY the extended (VP8X) header, which any WebP with alpha has. It
+  // stores the canvas size minus one as two 24-bit little-endian fields.
+  if (bytes.subarray(8, 12).toString() === "WEBP") {
+    const chunk = bytes.subarray(12, 16).toString();
+    if (chunk !== "VP8X") throw new Error(`${file}: WebP without VP8X`);
+    return {
+      width: bytes.readUIntLE(24, 3) + 1,
+      height: bytes.readUIntLE(27, 3) + 1,
+    };
   }
 
   // JPEG: walk the marker segments to the start-of-frame, which is the only one

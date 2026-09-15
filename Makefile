@@ -25,8 +25,8 @@ define assert_export
 endef
 
 ### LOCAL DEV
-.PHONY: serve
-serve:
+.PHONY: localdev
+localdev:
 	npm run dev
 
 ### DEVELOPMENT

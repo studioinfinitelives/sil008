@@ -17,6 +17,8 @@ interface FeatureRowProps {
   media: ReactNode;
   /** Put the media on the left on wide screens. */
   mediaLeft?: boolean;
+  /** Give the media three quarters of the row, from `xl` up. */
+  wideMedia?: boolean;
 }
 
 export function FeatureRow({
@@ -24,9 +26,20 @@ export function FeatureRow({
   children,
   media,
   mediaLeft = false,
+  wideMedia = false,
 }: FeatureRowProps) {
   return (
-    <section className="grid items-center gap-10 py-14 md:grid-cols-2 md:gap-16 md:py-24">
+    <section
+      className={cn(
+        "grid items-center gap-10 py-14 md:grid-cols-2 md:gap-16 md:py-24",
+        // Tracks follow painted position, not DOM order, so `mediaLeft` must
+        // mirror the template as well as swap `order`.
+        wideMedia &&
+          (mediaLeft
+            ? "xl:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]"
+            : "xl:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]"),
+      )}
+    >
       <div
         className={cn(
           "flex flex-col gap-4 text-center md:text-left",

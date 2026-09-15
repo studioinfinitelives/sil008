@@ -15,23 +15,20 @@ export type EvlLink =
   | { kind: "route"; href: Route; label: string }
   | { kind: "external"; href: string; label: string };
 
+export const EVL_BUY_URL = "https://www.thegamecrafter.com/games/team-evl";
+
+export const EVL_VIDEO_URL = "https://youtu.be/ecXGyscPgWw";
+
 export const evlLinks: readonly EvlLink[] = [
-  {
-    kind: "external",
-    href: "https://www.thegamecrafter.com/games/team-evl",
-    label: "Buy Online",
-  },
+  { kind: "external", href: EVL_BUY_URL, label: "Buy Online" },
   {
     kind: "external",
     href: currentRulebook.url,
     label: "Current Rules (PDF)",
   },
   { kind: "route", href: "/teamevl/rules", label: "Rules Archive" },
-  {
-    kind: "external",
-    href: "https://youtu.be/ecXGyscPgWw",
-    label: "How To Play",
-  },
+  { kind: "route", href: "/teamevl/howtoplay", label: "How To Play" },
+  { kind: "external", href: EVL_VIDEO_URL, label: "Video Tutorial" },
   {
     kind: "external",
     href: "https://boardgamegeek.com/boardgame/228575/team-evl",

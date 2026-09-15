@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { evlLinks, evlLinksExcept } from "@/lib/evlLinks";
+import {
+  EVL_BUY_URL,
+  EVL_VIDEO_URL,
+  evlLinks,
+  evlLinksExcept,
+} from "@/lib/evlLinks";
 import { currentRulebook } from "@/lib/rulebooks";
 
 /**
@@ -11,6 +16,18 @@ describe("evlLinks", () => {
   it("points at whatever edition is current, not a pinned file", () => {
     const rules = evlLinks.find((item) => item.label === "Current Rules (PDF)");
     expect(rules?.href).toBe(currentRulebook.url);
+  });
+
+  it("sends How To Play to the page and keeps the video beside it", () => {
+    const byLabel = (label: string) =>
+      evlLinks.find((item) => item.label === label);
+    expect(byLabel("How To Play")).toEqual({
+      kind: "route",
+      href: "/teamevl/howtoplay",
+      label: "How To Play",
+    });
+    expect(byLabel("Video Tutorial")?.href).toBe(EVL_VIDEO_URL);
+    expect(byLabel("Buy Online")?.href).toBe(EVL_BUY_URL);
   });
 
   it("names every destination exactly once", () => {
