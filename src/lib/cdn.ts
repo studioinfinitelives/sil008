@@ -1,9 +1,9 @@
 /**
  * CDN asset URLs.
  *
- * Files live in this repo's `cdn/` and are published by `make deploy-cdn`,
- * separately from the site. No product art is committed outside `cdn/`: this
- * repo is public and the artwork is not under its MIT licence.
+ * Files are kept in the gitignored `cdn/` and published by `make deploy-cdn`,
+ * separately from the site. NEVER COMMIT PRODUCT ART: this repo is public and
+ * the artwork is not under its MIT licence.
  *
  * INVARIANT: the host serves a one-year immutable cache, so a file can never be
  * replaced in place. New art means a new filename AND a changed constant here.

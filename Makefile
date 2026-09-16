@@ -65,11 +65,13 @@ preview-prod: build-prod
 # minutes. sil006 publishes the app's site from its own cdn/ -- two repos, two
 # sites, one project, because one site can only have one publisher.
 #
-# A Hosting deploy deletes every file absent from the public dir, so guard on a
-# known file: a half-finished move would wipe live art.
+# A Hosting deploy deletes every file absent from the public dir, and cdn/ is
+# gitignored so git cannot restore a partial one. Guard on a known file (the
+# test SKIPS when cdn/ is absent), then require every declared file via the test.
 .PHONY: deploy-cdn
 deploy-cdn:
 	@test -f cdn/site_infinitelives_logo.svg || { echo "ABORT: cdn/ is missing site_infinitelives_logo.svg -- wrong dir or bad move"; exit 1; }
+	npx vitest run src/lib/cdn.test.ts
 	firebase deploy --only hosting:sil-studio-art -P cdn --config firebase.cdn.json
 
 ### CHECKS

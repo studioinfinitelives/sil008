@@ -17,7 +17,7 @@ import {
 /**
  * Guards the published art in three parts:
  *
- * 1. Every declared URL resolves to a committed file. A missing file renders a
+ * 1. Every declared URL resolves to a file in `cdn/`. A missing file renders a
  *    written stand-in rather than throwing, so a typo is otherwise invisible.
  * 2. Every declared size is the file's own, read back out of the headers.
  *    `next/image` is unoptimized, so nothing at runtime contradicts a wrong
@@ -27,10 +27,13 @@ import {
  * Photographs come through `evlPhotos`, where their filenames are coined, and
  * get the same first two checks.
  *
+ * `cdn/` is gitignored, so every check that reads it skips on a clone without it.
+ * `make deploy-cdn` runs this file after confirming `cdn/` exists.
+ *
  * The drift check compares files rather than published ETags, because the app's
  * REPO is the source of truth here: drift should fail when sil006 changes, not
  * when it deploys. The opposite of `legal.ts`, which must match what the app
- * SERVES. Skipped when `../sil006` is absent.
+ * SERVES. Skipped when `../sil006/cdn/` or this repo's `cdn/` is absent.
  */
 
 const CDN_DIR = path.join(process.cwd(), "cdn");
@@ -118,34 +121,36 @@ describe("cdnUrl", () => {
   });
 });
 
-describe("published art", () => {
-  const declared = [
-    logoUrl,
-    ...Object.values(cardArt),
-    ...Object.values(habiArt),
-    ...Object.values(habiScreens),
-    evlLogo,
-    ...Object.values(evlArt).map((art) => art.src),
-    ...evlPhotos.map((photo) => photo.src),
-    ...Object.values(evlBlooms),
-    // Not art, but published from the same `cdn/` and subject to the same
-    // orphan check — a rulebook nothing links to is still a live download.
-    ...Object.values(evlRules),
-  ];
+const declared = [
+  logoUrl,
+  ...Object.values(cardArt),
+  ...Object.values(habiArt),
+  ...Object.values(habiScreens),
+  evlLogo,
+  ...Object.values(evlArt).map((art) => art.src),
+  ...evlPhotos.map((photo) => photo.src),
+  ...Object.values(evlBlooms),
+  // Not art, but published from the same `cdn/` and subject to the same
+  // orphan check — a rulebook nothing links to is still a live download.
+  ...Object.values(evlRules),
+];
 
-  it("every declared URL has a committed file in cdn/", () => {
+describe("declared art", () => {
+  it("every declared URL sits on the studio host", () => {
+    for (const url of declared) {
+      expect(url.startsWith("https://cdn.infinitelives.io/")).toBe(true);
+      expect(new URL(url).pathname.split("/")).toHaveLength(2);
+    }
+  });
+});
+
+describe.skipIf(!existsSync(CDN_DIR))("published art", () => {
+  it("every declared URL has a file in cdn/", () => {
     for (const url of declared) {
       const name = fileNameOf(url);
       expect(existsSync(path.join(CDN_DIR, name)), `cdn/${name} missing`).toBe(
         true,
       );
-    }
-  });
-
-  it("every declared URL sits on the studio host", () => {
-    for (const url of declared) {
-      expect(url.startsWith("https://cdn.infinitelives.io/")).toBe(true);
-      expect(new URL(url).pathname.split("/")).toHaveLength(2);
     }
   });
 
@@ -176,23 +181,26 @@ describe("published art", () => {
   });
 });
 
-describe.skipIf(!existsSync(SIL006_CDN))("copies of the app's art", () => {
-  it.each(SHARED_WITH_APP)("%s is byte-identical to sil006's", (name) => {
-    const mine = path.join(CDN_DIR, name);
-    const theirs = path.join(SIL006_CDN, name);
+describe.skipIf(!existsSync(SIL006_CDN) || !existsSync(CDN_DIR))(
+  "copies of the app's art",
+  () => {
+    it.each(SHARED_WITH_APP)("%s is byte-identical to sil006's", (name) => {
+      const mine = path.join(CDN_DIR, name);
+      const theirs = path.join(SIL006_CDN, name);
 
-    expect(existsSync(mine), `cdn/${name} missing`).toBe(true);
-    expect(existsSync(theirs), `sil006/cdn/${name} missing`).toBe(true);
-    expect(
-      readFileSync(mine).equals(readFileSync(theirs)),
-      `${name} has drifted — copy sil006's version across and re-run \`make deploy-cdn\``,
-    ).toBe(true);
-  });
+      expect(existsSync(mine), `cdn/${name} missing`).toBe(true);
+      expect(existsSync(theirs), `sil006/cdn/${name} missing`).toBe(true);
+      expect(
+        readFileSync(mine).equals(readFileSync(theirs)),
+        `${name} has drifted — copy sil006's version across and re-run \`make deploy-cdn\``,
+      ).toBe(true);
+    });
 
-  it("is referenced by habiArt, so a stale name here fails loudly", () => {
-    const referenced = new Set(Object.values(habiArt).map(fileNameOf));
-    for (const name of SHARED_WITH_APP) {
-      expect(referenced.has(name), `${name} is no longer used`).toBe(true);
-    }
-  });
-});
+    it("is referenced by habiArt, so a stale name here fails loudly", () => {
+      const referenced = new Set(Object.values(habiArt).map(fileNameOf));
+      for (const name of SHARED_WITH_APP) {
+        expect(referenced.has(name), `${name} is no longer used`).toBe(true);
+      }
+    });
+  },
+);

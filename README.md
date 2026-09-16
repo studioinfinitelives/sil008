@@ -38,7 +38,7 @@ src/
     ui/                     shadcn/ui primitives
   content/legal/            committed fallback copies of the legal documents
   lib/                      site constants, CDN URLs, ported habit maths
-cdn/                        artwork, published separately by `make deploy-cdn`
+cdn/                        artwork, gitignored, published by `make deploy-cdn`
 ```
 
 A component used by one route subtree lives in that route's `_components/`; one
@@ -67,10 +67,16 @@ restyles wholesale — no component knows which brand it renders under.
 ### Artwork
 
 Illustrations are served from the studio's own CDN host and named in
-`src/lib/cdn.ts`. The files themselves live in this repo's `cdn/` and are
-published by `make deploy-cdn`, independently of the site. That host is served
-immutable for a year — **a file there can never be updated in place**, so new
-art means a new filename and a changed constant.
+`src/lib/cdn.ts`. The files themselves are kept in a local `cdn/`, published by
+`make deploy-cdn` independently of the site. **`cdn/` is gitignored and must
+never be committed** — this repo is public and the art is not MIT-licensed — so
+a fresh clone has none, and the art checks in `cdn.test.ts` skip without it.
+That host is served immutable for a year — **a file there can never be updated
+in place**, so new art means a new filename and a changed constant.
+
+A Hosting deploy deletes every live file absent from the folder it publishes,
+so `cdn/` must be complete before `make deploy-cdn`. The target refuses to run
+unless every file `src/lib/cdn.ts` declares is present.
 
 The one exception is the studio mark: browsers require site icons on the site's
 own origin, so `src/app/icon.svg` is committed, along with `favicon.ico` and
