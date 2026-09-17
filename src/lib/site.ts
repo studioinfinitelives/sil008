@@ -3,8 +3,7 @@
  *
  * The canonical host must be stated exactly once: a sitemap that disagrees with
  * `metadataBase` is not surfaced until a crawler has indexed the wrong URLs.
- * Read by `app/layout.tsx`, `sitemap.ts`, `robots.ts` and both
- * `opengraph-image.tsx` routes.
+ * Read by `app/layout.tsx`, `sitemap.ts` and `robots.ts`.
  */
 
 /** No trailing slash — `new URL()` and the sitemap add their own. */

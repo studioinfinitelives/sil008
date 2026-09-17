@@ -32,7 +32,7 @@ src/
       _components/          Habi Sloth-only components
     teamevl/                product section, brand-scoped via data-section
       _components/          Team EvL-only components
-    opengraph-image.tsx     link-preview cards, rendered at build time
+    opengraph-image.jpg     link-preview images; each section has its own
     sitemap.ts  robots.ts
   components/               UI shared across route subtrees
     ui/                     shadcn/ui primitives
@@ -52,8 +52,8 @@ image optimizer** (`images.unoptimized` is on as a result). Two consequences
 worth knowing before adding anything:
 
 - Every dynamic route needs `generateStaticParams`.
-- Every metadata route handler — `sitemap.ts`, `robots.ts`, and both
-  `opengraph-image.tsx` files — must export `const dynamic = "force-static"`.
+- Every metadata route handler — `sitemap.ts` and `robots.ts` — must export
+  `const dynamic = "force-static"`.
   Without it the build fails rather than quietly skipping the file.
 
 ### Styling

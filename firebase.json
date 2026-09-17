@@ -7,10 +7,6 @@
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "headers": [
         {
-          "source": "**/opengraph-image",
-          "headers": [{ "key": "Content-Type", "value": "image/png" }]
-        },
-        {
           "source": "/_next/static/**",
           "headers": [
             {
@@ -27,10 +23,6 @@
       "cleanUrls": true,
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "headers": [
-        {
-          "source": "**/opengraph-image",
-          "headers": [{ "key": "Content-Type", "value": "image/png" }]
-        },
         {
           "source": "/_next/static/**",
           "headers": [

@@ -14,8 +14,8 @@ describe("/teamevl/howtoplay", () => {
       screen.getByRole("heading", { level: 1, name: "How to Play" }),
     ).toBeInTheDocument();
     for (const name of [
-      "Win a round",
-      "Your turn",
+      "How To Win",
+      "Your Turn",
       "Play",
       "Peek",
       "Draw",

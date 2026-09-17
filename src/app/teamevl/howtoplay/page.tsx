@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import { EvlArt } from "@/app/teamevl/_components/EvlArt";
 import { EvlBloomsFlourish } from "@/app/teamevl/_components/EvlBloomsFlourish";
 import {
@@ -16,16 +16,24 @@ import { currentRulebook } from "@/lib/rulebooks";
 const DESCRIPTION =
   "Learn Team EvL in a few minutes: win rounds by Calling the Ritual, one action per turn.";
 
-export const metadata: Metadata = {
-  title: "How to Play",
-  description: DESCRIPTION,
-  alternates: { canonical: "/teamevl/howtoplay" },
-  openGraph: {
-    title: "How to Play Team EvL",
+export async function generateMetadata(
+  _props: unknown,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  return {
+    title: "How to Play",
     description: DESCRIPTION,
-    url: "/teamevl/howtoplay",
-  },
-};
+    alternates: { canonical: "/teamevl/howtoplay" },
+    // Metadata merges SHALLOWLY: declaring `openGraph` here drops the image
+    // inherited from `teamevl/opengraph-image.jpg` unless it is carried over.
+    openGraph: {
+      title: "How to Play Team EvL",
+      description: DESCRIPTION,
+      url: "/teamevl/howtoplay",
+      images: (await parent).openGraph?.images,
+    },
+  };
+}
 
 /**
  * The rules walkthrough, laid out like /teamevl. Copy follows the Game Crafter
@@ -46,7 +54,7 @@ export default function Page() {
         </span>
 
         <h1 className="text-ink max-w-3xl text-4xl font-black tracking-tight sm:text-5xl">
-          How to Play
+          How to Play - Basics
         </h1>
         <p className="text-subtle text-sm font-bold tracking-wider uppercase">
           2–5 players · 30–60 min · Ages 14+
@@ -114,7 +122,7 @@ export default function Page() {
             <br />
             <b>Visual Right</b><br />
             A game fast forwards to the final turn.
-            The player places a card as their turn's single action and then calls
+            The player places a card as their turn&rsquo;s single action and then calls
             the ritual. Since the revealed cards match the center ritual card,
             they win the round. If they had been wrong, they would lose the round and play again next round.
             <EvlInfoDialog
@@ -141,7 +149,7 @@ export default function Page() {
             />
           }
         >
-          <strong className="text-ink">1. Take one action:</strong> Play,
+          <strong className="text-ink">1. Choose one action:</strong> Play,
           Heal, Peek, Draw or Challenge.
           <br /><br />
           <strong className="text-ink">2. Optionally,</strong> Call the
@@ -151,7 +159,7 @@ export default function Page() {
             do it soon enough, someone may beat you to it. They could win without you even trying. But they could also get it wrong, and then you could win on a later turn. Or if you wait forever, then everyone could get it wrong, and you win by default. Although, does that really feel like winning? You should probably think about that too.
             <br />
             <br />
-            <strong className="text-ink">Too Long; Did&rsquo;t Read</strong>
+            <strong className="text-ink">Too Long; Didn&rsquo;t Read</strong>
             <br />
             I Call the Ritual!
           </EvlInfoDialog>
@@ -161,7 +169,7 @@ export default function Page() {
         </FeatureRow>
 
         <FeatureRow
-          title="Play Facedown"
+          title="Play"
           wideMedia
           media={
             <EvlArt
@@ -198,7 +206,7 @@ export default function Page() {
           }
         >
           <p>
-            Secretly look at a top card in the ritual circle, then put it back
+            Privately look at a top card in the ritual circle, then put it back
             turned 90°.
             <br />
             <br />

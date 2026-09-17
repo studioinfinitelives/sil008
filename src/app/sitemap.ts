@@ -9,7 +9,7 @@ import { absoluteUrl } from "@/lib/site";
  * `generateStaticParams` reads, so a post cannot ship without appearing here.
  */
 
-// Required under `output: "export"` — see `app/opengraph-image.tsx`.
+// Required under `output: "export"` — see `robots.ts`.
 export const dynamic = "force-static";
 
 type Entry = MetadataRoute.Sitemap[number];
