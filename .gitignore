@@ -47,7 +47,8 @@ next-env.d.ts
 /private
 
 # CDN art, published by `make deploy-cdn`. NEVER COMMIT IT: this repo is public
-# and the artwork is not MIT-licensed. A fresh clone has no cdn/.
+# and the artwork is not MIT-licensed. A fresh clone has no cdn/: `make pull-cdn`
+# fills it from the live host, using the committed cdn.manifest.
 /cdn/
 
 # product art staged locally for review before it goes to the CDN.

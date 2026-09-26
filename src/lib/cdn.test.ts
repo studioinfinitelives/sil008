@@ -28,7 +28,7 @@ import {
  * get the same first two checks.
  *
  * `cdn/` is gitignored, so every check that reads it skips on a clone without it.
- * `make deploy-cdn` runs this file after confirming `cdn/` exists.
+ * `make deploy-cdn` runs this file after `pull-cdn` has filled `cdn/`.
  *
  * The drift check compares files rather than published ETags, because the app's
  * REPO is the source of truth here: drift should fail when sil006 changes, not
@@ -142,6 +142,26 @@ describe("declared art", () => {
       expect(new URL(url).pathname.split("/")).toHaveLength(2);
     }
   });
+
+  // Runs without cdn/, so a clone still catches a constant nobody published.
+  // Format and upkeep: ../sil_common/tool/cdn_sync.py.
+  it("every declared URL is listed in cdn.manifest", () => {
+    const listed = new Set(
+      readFileSync(path.join(process.cwd(), "cdn.manifest"), "utf8")
+        .split("\n")
+        .filter(Boolean)
+        .map((line) => line.split("  ")[1]),
+    );
+    for (const url of declared) {
+      const name = fileNameOf(url);
+      expect(listed.has(name), `${name} not in cdn.manifest`).toBe(true);
+    }
+  });
+
+  it("the Makefile pulls from the host these URLs point at", () => {
+    const makefile = readFileSync(path.join(process.cwd(), "Makefile"), "utf8");
+    expect(makefile).toMatch(/^CDN_HOST = https:\/\/cdn\.infinitelives\.io$/m);
+  });
 });
 
 describe.skipIf(!existsSync(CDN_DIR))("published art", () => {
@@ -192,7 +212,7 @@ describe.skipIf(!existsSync(SIL006_CDN) || !existsSync(CDN_DIR))(
       expect(existsSync(theirs), `sil006/cdn/${name} missing`).toBe(true);
       expect(
         readFileSync(mine).equals(readFileSync(theirs)),
-        `${name} has drifted — copy sil006's version across and re-run \`make deploy-cdn\``,
+        `${name} has drifted — the host is immutable, so carry sil006's version across under a new filename`,
       ).toBe(true);
     });
 

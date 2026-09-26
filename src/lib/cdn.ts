@@ -3,10 +3,11 @@
  *
  * Files are kept in the gitignored `cdn/` and published by `make deploy-cdn`,
  * separately from the site. NEVER COMMIT PRODUCT ART: this repo is public and
- * the artwork is not under its MIT licence.
+ * the artwork is not under its MIT licence. `cdn.manifest` lists them instead.
  *
  * INVARIANT: the host serves a one-year immutable cache, so a file can never be
- * replaced in place. New art means a new filename AND a changed constant here.
+ * replaced in place. New art means a new filename AND a changed constant here;
+ * `make deploy-cdn` refuses a changed file under a manifest-listed name.
  *
  * Server-only. Every importer is a server component, so the host is baked into
  * the exported HTML and never reaches the client bundle.
@@ -34,8 +35,8 @@ export const cardArt = {
 
 /**
  * Habi Sloth illustrations — byte-identical COPIES of `sil006/cdn/`, not
- * hotlinks (see `CDN_HOST`). A recrop upstream has to be carried across by
- * hand; `cdn.test.ts` fails on drift when `../sil006` is checked out.
+ * hotlinks (see `CDN_HOST`). A recrop upstream is carried across by hand, under
+ * a new filename; `cdn.test.ts` fails on drift when `../sil006` is checked out.
  *
  * Names are the app's, so they keep its `habi_*` prefix.
  */

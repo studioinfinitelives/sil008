@@ -70,13 +70,17 @@ Illustrations are served from the studio's own CDN host and named in
 `src/lib/cdn.ts`. The files themselves are kept in a local `cdn/`, published by
 `make deploy-cdn` independently of the site. **`cdn/` is gitignored and must
 never be committed** — this repo is public and the art is not MIT-licensed — so
-a fresh clone has none, and the art checks in `cdn.test.ts` skip without it.
+a fresh clone has none; `make pull-cdn` downloads it from the live host.
 That host is served immutable for a year — **a file there can never be updated
 in place**, so new art means a new filename and a changed constant.
 
-A Hosting deploy deletes every live file absent from the folder it publishes,
-so `cdn/` must be complete before `make deploy-cdn`. The target refuses to run
-unless every file `src/lib/cdn.ts` declares is present.
+A Hosting deploy deletes every live file absent from the folder it publishes.
+To make that impossible, the committed `cdn.manifest` lists every published
+file with its SHA-256. `make deploy-cdn` first pulls any listed file missing
+from `cdn/`, refuses if a listed file's bytes have changed, and adds new files
+to the manifest — commit `cdn.manifest` after the deploy. To retire a file,
+delete its manifest line and its `cdn/` copy. The sync script is shared with
+sil006: `../sil_common/tool/cdn_sync.py`.
 
 The one exception is the studio mark: browsers require site icons on the site's
 own origin, so `src/app/icon.svg` is committed, along with `favicon.ico` and
@@ -96,6 +100,7 @@ Everything goes through the `Makefile`, which mirrors `../sil006/Makefile`.
 | `make dev`          | build + deploy → <https://sil008-dev.web.app> |
 | `make prod`         | build + deploy → <https://sil008.web.app>     |
 | `make preview-prod` | production build on a 7-day preview channel   |
+| `make pull-cdn`     | fill `cdn/` from the live host (fresh clone)  |
 | `make deploy-cdn`   | publish `cdn/` artwork, no site build         |
 
 Both Hosting sites live in the one `sil008` Firebase project (see `.firebaserc`,

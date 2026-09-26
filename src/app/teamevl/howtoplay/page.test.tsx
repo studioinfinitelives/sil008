@@ -11,7 +11,7 @@ describe("/teamevl/howtoplay", () => {
     render(<Page />);
 
     expect(
-      screen.getByRole("heading", { level: 1, name: "How to Play" }),
+      screen.getByRole("heading", { level: 1, name: "How to Play - Basics" }),
     ).toBeInTheDocument();
     for (const name of [
       "How To Win",

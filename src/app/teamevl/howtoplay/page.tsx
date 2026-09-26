@@ -63,13 +63,19 @@ export default function Page() {
           Summon the demon before anyone else.
           <br />
           Do it 3x to be a winner just like these beautiful EvL liars.
-          <EvlInfoDialog label="Where these photos were taken" title="Fun Fact!">
-            Team EvL is played all around the world. This small sample of images happen to
-            be from
-            <br /><br />
+          <EvlInfoDialog
+            label="Where these photos were taken"
+            title="Fun Fact!"
+          >
+            Team EvL is played all around the world. This small sample of images
+            happen to be from
+            <br />
+            <br />
             (left to right) <br />
-            <b>France, Spain, Illinois, England, France, Bulgaria,
-              Bulgaria, California.</b>
+            <b>
+              France, Spain, Illinois, England, France, Bulgaria, Bulgaria,
+              California.
+            </b>
           </EvlInfoDialog>
         </p>
         {/* Full-bleed: `-mx-5` cancels the section's `px-5`, and stretch absorbs the margins. */}
@@ -113,25 +119,29 @@ export default function Page() {
           }
         >
           <p>
-            Every player has the option to <b>Call the Ritual</b> immediately after they take their turn.
+            Every player has the option to <b>Call the Ritual</b> immediately
+            after they take their turn.
             <br />
             <br />
-            Calling the ritual reveals all top cards around the ritual circle. If the element icons match the ritual, you win
-            the round. <b>Win 3 rounds and you win the game.</b>
+            Calling the ritual reveals all top cards around the ritual circle.
+            If the element icons match the ritual, you win the round.{" "}
+            <b>Win 3 rounds and you win the game.</b>
             <br />
             <br />
-            <b>Visual Right</b><br />
-            A game fast forwards to the final turn.
-            The player places a card as their turn&rsquo;s single action and then calls
-            the ritual. Since the revealed cards match the center ritual card,
-            they win the round. If they had been wrong, they would lose the round and play again next round.
+            <b>Visual Right</b>
+            <br />A game fast forwards to the final turn. The player places a
+            card as their turn&rsquo;s single action and then calls the ritual.
+            Since the revealed cards match the center ritual card, they win the
+            round. If they had been wrong, they would lose the round and play
+            again next round.
             <EvlInfoDialog
               label="What happens when a player is removed from a round"
               title="Ritual Cleanse"
             >
               When a player is removed from a round, a <b>Ritual Cleanse</b> is
               performed where all their cards are removed from the game and all
-              faceup incorrect cards are returned to their owner. Play then continues to the player on the left.
+              faceup incorrect cards are returned to their owner. Play then
+              continues to the player on the left.
             </EvlInfoDialog>
           </p>
         </FeatureRow>
@@ -151,20 +161,28 @@ export default function Page() {
         >
           <strong className="text-ink">1. Choose one action:</strong> Play,
           Heal, Peek, Draw or Challenge.
-          <br /><br />
-          <strong className="text-ink">2. Optionally,</strong> Call the
-          Ritual and either win or lose the round. Play continues until someone calls the ritual correctly, or only one player remains.
+          <br />
+          <br />
+          <strong className="text-ink">2. Optionally,</strong> Call the Ritual
+          and either win or lose the round. Play continues until someone calls
+          the ritual correctly, or only one player remains.
           <EvlInfoDialog label="When to Call the Ritual" title="Take Care!">
-            You can only Call the Ritual once per round. If you are wrong, you are out of the round. But if you don&rsquo;t
-            do it soon enough, someone may beat you to it. They could win without you even trying. But they could also get it wrong, and then you could win on a later turn. Or if you wait forever, then everyone could get it wrong, and you win by default. Although, does that really feel like winning? You should probably think about that too.
+            You can only Call the Ritual once per round. If you are wrong, you
+            are out of the round. But if you don&rsquo;t do it soon enough,
+            someone may beat you to it. They could win without you even trying.
+            But they could also get it wrong, and then you could win on a later
+            turn. Or if you wait forever, then everyone could get it wrong, and
+            you win by default. Although, does that really feel like winning?
+            You should probably think about that too.
             <br />
             <br />
             <strong className="text-ink">Too Long; Didn&rsquo;t Read</strong>
-            <br />
-            I Call the Ritual!
+            <br />I Call the Ritual!
           </EvlInfoDialog>
           <p className="mt-6">
-            <strong className="text-ink">All the Time:</strong> Observe, question, make funny faces; Get information by any (polite, verbal) means necessary. Table talk is not only acceptable, it&rsquo;s EvL.
+            <strong className="text-ink">All the Time:</strong> Observe,
+            question, make funny faces; Get information by any (polite, verbal)
+            means necessary. Table talk is not only acceptable, it&rsquo;s EvL.
           </p>
         </FeatureRow>
 
@@ -181,14 +199,18 @@ export default function Page() {
           }
         >
           <p>
-            You may play an Element facedown from your hand in an <b>empty spot or occupied</b> by a different facedown card. If you play on top of an existing card you must draw a <b>*Raven Card.</b>
+            You may play an Element facedown from your hand in an{" "}
+            <b>empty spot or occupied</b> by a different facedown card. If you
+            play on top of an existing card you must draw a <b>*Raven Card.</b>
             <br />
             <br />
             Any Element can go anywhere, so bluff away. Only the correct ones
             complete the ritual.
             <br />
             <br />
-            <b>Hint: </b>Think of each card as a truth or a lie. Will you tell the truth to quietly advance the ritual, or lie to prevent others from winning?
+            <b>Hint: </b>Think of each card as a truth or a lie. Will you tell
+            the truth to quietly advance the ritual, or lie to prevent others
+            from winning?
           </p>
         </FeatureRow>
 

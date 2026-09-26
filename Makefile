@@ -66,13 +66,24 @@ preview-prod: build-prod
 # sites, one project, because one site can only have one publisher.
 #
 # A Hosting deploy deletes every file absent from the public dir, and cdn/ is
-# gitignored so git cannot restore a partial one. Guard on a known file (the
-# test SKIPS when cdn/ is absent), then require every declared file via the test.
-.PHONY: deploy-cdn
-deploy-cdn:
-	@test -f cdn/site_infinitelives_logo.svg || { echo "ABORT: cdn/ is missing site_infinitelives_logo.svg -- wrong dir or bad move"; exit 1; }
+# gitignored. The committed cdn.manifest lists every published file, so the
+# deploy first PULLS any listed file missing from cdn/ off the live host, then
+# RECORDS new files into the manifest -- no deploy can drop a published one.
+# Retiring a file = delete its manifest line AND cdn/ file (see
+# ../sil_common/tool/cdn_sync.py). Commit cdn.manifest after every deploy.
+CDN_SYNC = python3 ../sil_common/tool/cdn_sync.py
+CDN_HOST = https://cdn.infinitelives.io
+
+.PHONY: pull-cdn deploy-cdn
+pull-cdn:
+	@test -d ../sil_common || { echo "ABORT: ../sil_common not found"; exit 1; }
+	$(CDN_SYNC) pull --cdn-dir cdn --manifest cdn.manifest --host $(CDN_HOST)
+
+deploy-cdn: pull-cdn
+	$(CDN_SYNC) record --cdn-dir cdn --manifest cdn.manifest
 	npx vitest run src/lib/cdn.test.ts
 	firebase deploy --only hosting:sil-studio-art -P cdn --config firebase.cdn.json
+	@git diff --quiet -- cdn.manifest || echo "cdn.manifest changed -- commit it"
 
 ### CHECKS
 # Everything CI would run, if there were CI. `make check` before any deploy.
