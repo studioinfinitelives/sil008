@@ -26,18 +26,18 @@ endef
 
 ### LOCAL DEV
 .PHONY: localdev
-localdev:
+localdev: ## Run the Next dev server
 	npm run dev
 
 ### DEVELOPMENT
 # Build and publish to https://sil008-dev.web.app.
 .PHONY: dev build-dev deploy-dev
-dev: build-dev deploy-dev
+dev: build-dev deploy-dev ## Build + deploy to sil008-dev
 
-build-dev:
+build-dev: ## Clean static export (no deploy)
 	$(call web_build)
 
-deploy-dev:
+deploy-dev: ## Deploy the current out/ to sil008-dev
 	$(call assert_export,build-dev)
 	firebase deploy --only hosting:dev
 
@@ -46,16 +46,16 @@ deploy-dev:
 # `preview-prod` puts the same build on a temporary channel instead — always the
 # last step before a DNS change (see README).
 .PHONY: prod build-prod deploy-prod preview-prod
-prod: build-prod deploy-prod
+prod: build-prod deploy-prod ## Build + deploy to prod
 
-build-prod:
+build-prod: ## Clean static export (no deploy)
 	$(call web_build)
 
-deploy-prod:
+deploy-prod: ## Deploy the current out/ to prod
 	$(call assert_export,build-prod)
 	firebase deploy --only hosting:prod
 
-preview-prod: build-prod
+preview-prod: build-prod ## Build + deploy to the prod preview channel (7d)
 	$(call assert_export,build-prod)
 	firebase hosting:channel:deploy preview --only prod --expires 7d
 
@@ -75,11 +75,11 @@ CDN_SYNC = python3 ../sil_common/tool/cdn_sync.py
 CDN_HOST = https://cdn.infinitelives.io
 
 .PHONY: pull-cdn deploy-cdn
-pull-cdn:
+pull-cdn: ## Fetch manifest-listed files missing from cdn/
 	@test -d ../sil_common || { echo "ABORT: ../sil_common not found"; exit 1; }
 	$(CDN_SYNC) pull --cdn-dir cdn --manifest cdn.manifest --host $(CDN_HOST)
 
-deploy-cdn: pull-cdn
+deploy-cdn: pull-cdn ## Pull, record manifest, test, publish cdn/ art
 	$(CDN_SYNC) record --cdn-dir cdn --manifest cdn.manifest
 	npx vitest run src/lib/cdn.test.ts
 	firebase deploy --only hosting:sil-studio-art -P cdn --config firebase.cdn.json
@@ -88,16 +88,23 @@ deploy-cdn: pull-cdn
 ### CHECKS
 # Everything CI would run, if there were CI. `make check` before any deploy.
 .PHONY: check typecheck lint format-check test
-check: typecheck lint format-check test
+check: typecheck lint format-check test ## typecheck + lint + format-check + test
 
-typecheck:
+typecheck: ## TypeScript typecheck
 	npm run typecheck
 
-lint:
+lint: ## ESLint
 	npm run lint
 
-format-check:
+format-check: ## Prettier check
 	npm run format:check
 
-test:
+test: ## Vitest run
 	npm run test:run
+
+### HELP
+# List every target tagged with a trailing `## description`, grouped under its
+# `### SECTION` header. Tag new targets the same way to have them show up here.
+.PHONY: help
+help: ## List targets
+	@awk 'BEGIN {FS = ":.*## "} /^### / {printf "\n%s\n", substr($$0, 5)} /^[a-zA-Z0-9_-]+:.*## / {printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
