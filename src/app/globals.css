@@ -62,6 +62,15 @@
   --color-evl-gold: #d8b162; /* the gold element card */
   --color-evl-blood: #94354b; /* the red element card */
 
+  /* Fantasy Apples, transcribed one-way from sil009/lib/theme/app_theme.dart.
+     This file is a copy, never a source — the app owns these values. */
+  --color-fa-navy: #0b2545; /* primary, light */
+  --color-fa-steel: #8da9c4; /* secondary */
+  --color-fa-ice: #9cc3ec; /* primary, dark */
+  --color-fa-ice-bright: #a8e4fa; /* `brandIce`, dark */
+  --color-fa-rink: #eef4fa; /* surfaceDim, light */
+  --color-fa-rink-line: #cfdbeb;
+
   /* ── Semantic layer — studio, light. Every other combination overrides
         these same properties below. ─────────────────────────────────────── */
   --color-canvas: #ffffff;
@@ -270,6 +279,41 @@
   --color-brand-bright: #c9a6e0;
   --color-on-brand: #140e17; /* 9.40 on the gold */
   --color-on-brand-bright: #140e17; /* 9.06 */
+}
+
+/* ── Fantasy Apples, light ────────────────────────────────────────────────
+   Verified on the inherited white canvas: ink 15.39, subtle 7.29, link 5.75. */
+[data-section="fantasyapples"] {
+  --color-surface: var(--color-fa-rink);
+  --color-surface-alt: var(--color-fa-rink);
+  --color-line: var(--color-fa-rink-line);
+
+  --color-ink: var(--color-fa-navy);
+  --color-subtle: #46586e;
+  --color-link: #1565c0; /* the app's `notice` */
+
+  --color-brand: var(--color-fa-navy);
+  --color-brand-bright: var(--color-fa-steel);
+  --color-on-brand: #ffffff; /* 15.39 */
+  --color-on-brand-bright: var(--color-fa-navy); /* 6.30 */
+}
+
+/* ── Fantasy Apples, dark ─────────────────────────────────────────────────
+   The app's own dark surfaces. Verified: ink 15.14, subtle 8.85, link 10.15. */
+.dark [data-section="fantasyapples"] {
+  --color-canvas: #0e131a;
+  --color-surface: #151b24;
+  --color-surface-alt: #0a0e13;
+  --color-line: #2a3f57;
+
+  --color-ink: #e3e8ef;
+  --color-subtle: #a7b4c4;
+  --color-link: var(--color-fa-ice);
+
+  --color-brand: var(--color-fa-ice);
+  --color-brand-bright: var(--color-fa-ice-bright);
+  --color-on-brand: var(--color-fa-navy); /* 8.38 */
+  --color-on-brand-bright: var(--color-fa-navy); /* 11.10 */
 }
 
 @layer base {

@@ -38,6 +38,11 @@ export default function Page() {
           to="/habisloth"
         />
         <ProjectCard
+          name="Fantasy Apples"
+          src={cardArt.fantasyapples}
+          to="/fantasyapples"
+        />
+        <ProjectCard
           name="More"
           subtitle="Coming Soon"
           src={cardArt.comingSoon}

@@ -9,6 +9,7 @@ import {
   evlBlooms,
   evlLogo,
   evlRules,
+  faArt,
   habiArt,
   habiScreens,
   logoUrl,
@@ -130,6 +131,7 @@ const declared = [
   ...Object.values(evlArt).map((art) => art.src),
   ...evlPhotos.map((photo) => photo.src),
   ...Object.values(evlBlooms),
+  ...Object.values(faArt).map((art) => art.src),
   // Not art, but published from the same `cdn/` and subject to the same
   // orphan check — a rulebook nothing links to is still a live download.
   ...Object.values(evlRules),
@@ -188,8 +190,12 @@ describe.skipIf(!existsSync(CDN_DIR))("published art", () => {
     expect(orphans).toEqual([]);
   });
 
-  it("gives every Team EvL image the size it was actually uploaded at", () => {
-    const sized = [...Object.values(evlArt), ...evlPhotos];
+  it("gives every sized image the size it was actually uploaded at", () => {
+    const sized = [
+      ...Object.values(evlArt),
+      ...evlPhotos,
+      ...Object.values(faArt),
+    ];
     for (const { src, width, height } of sized) {
       const file = path.join(CDN_DIR, fileNameOf(src));
       const { width: actual, height: actualHeight } = sizeOf(file);

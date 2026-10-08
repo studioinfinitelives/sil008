@@ -30,6 +30,7 @@ export const logoUrl = cdnUrl("site_infinitelives_logo.svg");
 export const cardArt = {
   teamevl: cdnUrl("site_card_teamevl.png"),
   habisloth: cdnUrl("site_card_habisloth.png"),
+  fantasyapples: cdnUrl("site_card_fantasyapples.png"),
   comingSoon: cdnUrl("site_card_pbnk.svg"),
 } as const;
 
@@ -142,4 +143,35 @@ export const evlRules = {
  */
 export const habiScreens = {
   home: cdnUrl("tiny_good_deed.png"),
+} as const;
+
+/**
+ * Fantasy Apples (`../sil009`). The logo is rendered from that repo's root
+ * `FantasyApples.png`; a new logo there is carried across by hand, under a new
+ * filename. Sizes are checked against the files, as `evlArt`'s are.
+ */
+export const faArt = {
+  logo: { src: cdnUrl("fa_logo.png"), width: 720, height: 580 },
+  playersGrid: {
+    src: cdnUrl("fa_players_grid.png"),
+    width: 3406,
+    height: 1742,
+  },
+  playerCard: { src: cdnUrl("fa_player_card.png"), width: 626, height: 1054 },
+  playerStar: { src: cdnUrl("fa_player_star.png"), width: 932, height: 1558 },
+  managersGrid: {
+    src: cdnUrl("fa_managers_phone.jpg"),
+    width: 960,
+    height: 1726,
+  },
+  gridSettings: {
+    src: cdnUrl("fa_grid_settings.png"),
+    width: 1056,
+    height: 1660,
+  },
+  rosterWatchlist: {
+    src: cdnUrl("fa_roster_watchlist.png"),
+    width: 724,
+    height: 1230,
+  },
 } as const;
