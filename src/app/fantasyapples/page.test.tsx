@@ -20,10 +20,18 @@ describe("/fantasyapples", () => {
 
     // The hero logo is decorative and `alt=""`, so it is not an `img`.
     const images = screen.getAllByRole("img");
-    expect(images).toHaveLength(6);
+    expect(images).toHaveLength(5);
     for (const image of images) {
       expect(image.getAttribute("alt")?.length).toBeGreaterThan(0);
     }
+  });
+
+  it("describes the demo video through its play/pause button", () => {
+    render(<Page />);
+
+    expect(
+      screen.getByRole("button", { name: /filtering the Players grid/ }),
+    ).toBeInTheDocument();
   });
 
   it("sends both calls to action to the app, told apart for analytics", () => {

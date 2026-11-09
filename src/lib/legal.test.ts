@@ -2,8 +2,6 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
-  LEGAL_DOCUMENTS,
-  LEGAL_VERSION,
   SITE_LEGAL_VERSION,
   parseInline,
   parseLegalMarkdown,
@@ -11,14 +9,14 @@ import {
 
 /**
  * The parser decides both what these pages say and whether the build succeeds.
- * The last block runs it over the real committed documents, so an upstream
- * refresh introducing an unsupported construct fails here, not on a deploy.
+ * The last block runs it over the real committed document, so an unsupported
+ * construct fails here, not on a deploy.
  */
 
-const parse = (markdown: string, expectedVersion = LEGAL_VERSION) =>
+const parse = (markdown: string, expectedVersion = SITE_LEGAL_VERSION) =>
   parseLegalMarkdown(markdown, { expectedVersion });
 
-const doc = (body: string, version = LEGAL_VERSION) =>
+const doc = (body: string, version = SITE_LEGAL_VERSION) =>
   `# Privacy Policy\n\n**Effective date: July 28, 2026 (version ${version})**\n\n${body}\n`;
 
 describe("parseInline", () => {
@@ -50,7 +48,7 @@ describe("parseLegalMarkdown", () => {
     const result = parse(doc("## 1. Who we are\n\nWe are us."));
     expect(result.title).toBe("Privacy Policy");
     expect(result.effectiveDate).toBe("July 28, 2026");
-    expect(result.version).toBe(LEGAL_VERSION);
+    expect(result.version).toBe(SITE_LEGAL_VERSION);
   });
 
   it("rejoins a soft-wrapped paragraph into one block", () => {
@@ -91,10 +89,9 @@ describe("parseLegalMarkdown", () => {
     ]);
   });
 
-  // The guard the whole build-time fetch exists for.
-  it("throws when the upstream version has moved on", () => {
+  it("throws when the file's version doesn't match the site", () => {
     expect(() => parse(doc("Body.", 4))).toThrow(
-      /habisloth\.app is serving version 4.*written against 3/s,
+      /the file is version 4.*written against 1/s,
     );
   });
 
@@ -120,35 +117,6 @@ describe("parseLegalMarkdown", () => {
 });
 
 describe("the committed documents", () => {
-  it.each(Object.entries(LEGAL_DOCUMENTS))(
-    "parses %s at the expected version",
-    async (_id, { fallback }) => {
-      const markdown = await readFile(
-        path.join(process.cwd(), "src", "content", "legal", fallback),
-        "utf8",
-      );
-      const result = parse(markdown);
-
-      expect(result.version).toBe(LEGAL_VERSION);
-
-      // Both documents open with an unheaded intro, then numbered sections.
-      expect(result.blocks[0]?.kind).toBe("paragraph");
-
-      const headings = result.blocks
-        .filter((block) => block.kind === "heading")
-        .map((block) => block.text.map((run) => run.value).join(""));
-
-      expect(headings.length).toBeGreaterThan(5);
-      expect(headings[0]).toMatch(/^1\. /);
-      expect(headings.at(-1)).toMatch(/Contact$/);
-    },
-  );
-
-  /**
-   * The studio's notice is not in `LEGAL_DOCUMENTS` (no upstream to mirror), so
-   * it needs its own case or an unsupported construct would sail past this file
-   * and fail on a deploy.
-   */
   it("parses the studio privacy notice at its own version", async () => {
     const markdown = await readFile(
       path.join(process.cwd(), "src", "content", "legal", "site-privacy.md"),

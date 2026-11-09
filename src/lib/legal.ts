@@ -2,38 +2,11 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 /**
- * Habi Sloth's legal documents — fetched from the app at build time, not copied.
- *
- * The app serves its own `assets/legal/` as markdown at
- * `habisloth.app/assets/assets/legal/{privacy,terms}.md`. That URL is the source
- * of truth, so this site renders whatever the app is currently showing users.
- *
- * Two guards:
- *
- * 1. Version asserted. Each document carries `**Effective date: … (version N)**`;
- *    if N stops matching `LEGAL_VERSION` the build throws rather than silently
- *    serving terms that no longer match the app's.
- * 2. Fallback committed under `src/content/legal/`, so an unreachable
- *    habisloth.app does not fail the build.
+ * The studio's own legal notice, read off disk at build. Each product's legal
+ * pages live on that product's site and are linked, never copied here.
  *
  * Server-only: reads the filesystem, runs at build time under `output: "export"`.
  */
-
-/**
- * Bumping this is deliberate: review the upstream change, then refresh the
- * fallback copies in `src/content/legal/` in the same commit.
- */
-export const LEGAL_VERSION = 3;
-
-const REMOTE_BASE = "https://habisloth.app/assets/assets/legal";
-
-/** The documents this module knows how to load. */
-export const LEGAL_DOCUMENTS = {
-  privacy: { remote: "privacy.md", fallback: "habisloth-privacy.md" },
-  terms: { remote: "terms.md", fallback: "habisloth-terms.md" },
-} as const;
-
-export type LegalDocumentId = keyof typeof LEGAL_DOCUMENTS;
 
 /* ────────────────────────────── document model ───────────────────────────── */
 
@@ -56,8 +29,6 @@ export interface LegalDocument {
   version: number;
   /** Everything after the effective-date line. */
   blocks: Block[];
-  /** Where the markdown came from — `"fallback"` means habisloth.app was unreachable. */
-  origin: "habisloth.app" | "fallback";
 }
 
 /* ─────────────────────────────────── parse ───────────────────────────────── */
@@ -123,7 +94,7 @@ export function parseInline(source: string): Inline[] {
 export function parseLegalMarkdown(
   markdown: string,
   { expectedVersion }: { expectedVersion: number },
-): Omit<LegalDocument, "origin"> {
+): LegalDocument {
   // Paragraphs are soft-wrapped in the source, so blank lines are the only
   // block separator. \r\n guards against the file being edited on Windows.
   const paragraphs = markdown
@@ -155,10 +126,8 @@ export function parseLegalMarkdown(
   const version = Number(rawVersion);
   if (version !== expectedVersion) {
     throw new Error(
-      `Legal version mismatch in "${title}": habisloth.app is serving version ${version}, ` +
-        `but this site is written against ${expectedVersion}. Review the upstream change in ` +
-        `sil006/assets/legal/, refresh the fallback copy in src/content/legal/, then bump ` +
-        `LEGAL_VERSION in src/lib/legal.ts.`,
+      `Legal version mismatch in "${title}": the file is version ${version}, but this site is ` +
+        `written against ${expectedVersion}. Update SITE_LEGAL_VERSION in src/lib/legal.ts.`,
     );
   }
 
@@ -217,63 +186,16 @@ function toBlock(chunk: string): Block {
 
 /* ─────────────────────────────────── load ────────────────────────────────── */
 
-const FALLBACK_DIR = path.join(process.cwd(), "src", "content", "legal");
+const LEGAL_DIR = path.join(process.cwd(), "src", "content", "legal");
 
-/**
- * Prefers the copy habisloth.app is serving, falling back to the committed one
- * if the fetch fails. A version mismatch is NOT a fetch failure: it propagates
- * and fails the build.
- */
-export async function loadLegalDocument(
-  id: LegalDocumentId,
-): Promise<LegalDocument> {
-  const { remote, fallback } = LEGAL_DOCUMENTS[id];
-
-  let markdown: string | undefined;
-  try {
-    const response = await fetch(`${REMOTE_BASE}/${remote}`, {
-      cache: "force-cache",
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    markdown = await response.text();
-  } catch (cause) {
-    console.warn(
-      `[legal] Could not fetch ${remote} from habisloth.app (${String(cause)}); ` +
-        `falling back to the committed copy. Note this build did not verify the ` +
-        `live document's version.`,
-    );
-  }
-
-  const origin = markdown === undefined ? "fallback" : "habisloth.app";
-  markdown ??= await readFile(path.join(FALLBACK_DIR, fallback), "utf8");
-
-  return {
-    ...parseLegalMarkdown(markdown, { expectedVersion: LEGAL_VERSION }),
-    origin,
-  };
-}
-
-/**
- * The studio's own notice version. Unrelated to `LEGAL_VERSION`, which tracks
- * habisloth.app. This document has no upstream, so the assertion only stops the
- * constant rotting away from the file it describes.
- */
+/** The studio notice's version. A mismatch with the file fails the build. */
 export const SITE_LEGAL_VERSION = 1;
 
-/**
- * Loads a document this repo owns. Kept separate from `loadLegalDocument`
- * rather than added to `LEGAL_DOCUMENTS`: a `remote` entry for a document with
- * no remote would make the fetch-and-assert path lie about what it checks.
- */
+/** Loads a legal document this repo owns. */
 export async function loadLocalLegalDocument(
   fileName: string,
   expectedVersion: number,
 ): Promise<LegalDocument> {
-  const markdown = await readFile(path.join(FALLBACK_DIR, fileName), "utf8");
-  return {
-    ...parseLegalMarkdown(markdown, { expectedVersion }),
-    origin: "fallback",
-  };
+  const markdown = await readFile(path.join(LEGAL_DIR, fileName), "utf8");
+  return parseLegalMarkdown(markdown, { expectedVersion });
 }

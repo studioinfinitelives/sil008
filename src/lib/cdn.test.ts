@@ -64,6 +64,18 @@ const fileNameOf = (url: string) => new URL(url).pathname.slice(1);
 function sizeOf(file: string): { width: number; height: number } {
   const bytes = readFileSync(file);
 
+  // MP4: the first track header's width and height, 16.16 fixed point, at the
+  // end of the box. Assumes a version-0 `tkhd` and a video-only file, so the
+  // first track is the picture.
+  if (bytes.subarray(4, 8).toString() === "ftyp") {
+    const at = bytes.indexOf("tkhd");
+    if (at < 0 || bytes[at + 4] !== 0) throw new Error(`${file}: no v0 tkhd`);
+    return {
+      width: bytes.readUInt32BE(at + 80) >>> 16,
+      height: bytes.readUInt32BE(at + 84) >>> 16,
+    };
+  }
+
   // PNG: an 8-byte signature, then IHDR, whose first two fields are the size.
   if (bytes.subarray(1, 4).toString() === "PNG") {
     return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
@@ -132,6 +144,7 @@ const declared = [
   ...evlPhotos.map((photo) => photo.src),
   ...Object.values(evlBlooms),
   ...Object.values(faArt).map((art) => art.src),
+  faArt.filtersDemo.poster,
   // Not art, but published from the same `cdn/` and subject to the same
   // orphan check — a rulebook nothing links to is still a live download.
   ...Object.values(evlRules),
@@ -181,9 +194,18 @@ describe.skipIf(!existsSync(CDN_DIR))("published art", () => {
     // one-way door (immutable cache), which is why these stay:
     //   habi_wheel_shot.png      — for a page that does not exist yet.
     //   site_card_comingsoon.png — superseded by site_card_pbnk.svg.
+    //   fa_players_grid.png      — superseded by fa_filters_demo_crop.mp4.
+    //   fa_filters_demo.mp4, fa_filters_demo_poster.jpg — superseded by the
+    //                              _crop pair.
     // Anything else unreferenced is a dead upload or a forgotten constant.
     const referenced = new Set(declared.map(fileNameOf));
-    const spares = new Set(["habi_wheel_shot.png", "site_card_comingsoon.png"]);
+    const spares = new Set([
+      "habi_wheel_shot.png",
+      "site_card_comingsoon.png",
+      "fa_players_grid.png",
+      "fa_filters_demo.mp4",
+      "fa_filters_demo_poster.jpg",
+    ]);
     const orphans = readdirSync(CDN_DIR).filter(
       (name) => !referenced.has(name) && !spares.has(name),
     );
@@ -195,6 +217,7 @@ describe.skipIf(!existsSync(CDN_DIR))("published art", () => {
       ...Object.values(evlArt),
       ...evlPhotos,
       ...Object.values(faArt),
+      { ...faArt.filtersDemo, src: faArt.filtersDemo.poster },
     ];
     for (const { src, width, height } of sized) {
       const file = path.join(CDN_DIR, fileNameOf(src));

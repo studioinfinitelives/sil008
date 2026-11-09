@@ -1,3 +1,12 @@
+---
+issue: 1
+title: Team EvL product page at /teamevl
+status: Review
+synced: Review
+item: PVTI_lADOBDBK484BiBnazg43rhU
+shipped: yes
+---
+
 # ISSUE 1 — Team EvL product page at `/teamevl`
 
 **Issue:** https://github.com/studioinfinitelives/sil008/issues/1

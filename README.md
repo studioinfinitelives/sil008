@@ -36,7 +36,7 @@ src/
     sitemap.ts  robots.ts
   components/               UI shared across route subtrees
     ui/                     shadcn/ui primitives
-  content/legal/            committed fallback copies of the legal documents
+  content/legal/            the studio's own privacy notice
   lib/                      site constants, CDN URLs, ported habit maths
 cdn/                        artwork, gitignored, published by `make deploy-cdn`
 ```
@@ -97,7 +97,7 @@ Everything goes through the `Makefile`, which mirrors `../sil006/Makefile`.
 | Command             | What it does                                  |
 | ------------------- | --------------------------------------------- |
 | `make check`        | typecheck, lint, format check, tests          |
-| `make dev`          | build + deploy → <https://sil008-dev.web.app> |
+| `make deploy-dev`   | build + deploy → <https://sil008-dev.web.app> |
 | `make prod`         | build + deploy → <https://sil008.web.app>     |
 | `make preview-prod` | production build on a 7-day preview channel   |
 | `make pull-cdn`     | fill `cdn/` from the live host (fresh clone)  |

@@ -1,3 +1,12 @@
+---
+issue: 6
+title: Team EvL: spinning photo carousel of real games
+status: Review
+synced: Review
+item: PVTI_lADOBDBK484BiBnazg52soA
+shipped: yes
+---
+
 # ISSUE 6 — Team EvL: spinning photo carousel of real games
 
 **Issue:** https://github.com/studioinfinitelives/sil008/issues/6

@@ -1,3 +1,12 @@
+---
+issue: 4
+title: Google Analytics with opt-in cookie consent
+status: Review
+synced: Review
+item: PVTI_lADOBDBK484BiBnazg5dqC0
+shipped: yes
+---
+
 # ISSUE 4 — Google Analytics with opt-in cookie consent
 
 **Issue:** https://github.com/studioinfinitelives/sil008/issues/4

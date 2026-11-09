@@ -194,7 +194,7 @@ export default function Page() {
       </section>
 
       <div className="mx-auto max-w-6xl px-5 pb-6">
-        <HabiSlothLinks omit="/habisloth" />
+        <HabiSlothLinks />
       </div>
     </main>
   );

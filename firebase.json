@@ -5,9 +5,53 @@
       "public": "out",
       "cleanUrls": true,
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "redirects": [
+        {
+          "source": "/habisloth/privacy",
+          "destination": "https://habisloth.app/privacy.html",
+          "type": 301
+        },
+        {
+          "source": "/habisloth/privacy.html",
+          "destination": "https://habisloth.app/privacy.html",
+          "type": 301
+        },
+        {
+          "source": "/habisloth/terms",
+          "destination": "https://habisloth.app/terms.html",
+          "type": 301
+        },
+        {
+          "source": "/habisloth/terms.html",
+          "destination": "https://habisloth.app/terms.html",
+          "type": 301
+        }
+      ],
       "headers": [
         {
           "source": "/_next/static/**",
+          "redirects": [
+            {
+              "source": "/habisloth/privacy",
+              "destination": "https://habisloth.app/privacy.html",
+              "type": 301
+            },
+            {
+              "source": "/habisloth/privacy.html",
+              "destination": "https://habisloth.app/privacy.html",
+              "type": 301
+            },
+            {
+              "source": "/habisloth/terms",
+              "destination": "https://habisloth.app/terms.html",
+              "type": 301
+            },
+            {
+              "source": "/habisloth/terms.html",
+              "destination": "https://habisloth.app/terms.html",
+              "type": 301
+            }
+          ],
           "headers": [
             {
               "key": "Cache-Control",

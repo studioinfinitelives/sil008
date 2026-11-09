@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 /**
  * The studio's own privacy and cookie notice. Separate from
- * `/habisloth/privacy`, which governs the app. This is what the cookie banner's
+ * each product's own policy. This is what the cookie banner's
  * "Learn more" points at, so it must describe THIS site's cookies.
  *
  * No upstream to mirror: the markdown is committed and read off disk at build.

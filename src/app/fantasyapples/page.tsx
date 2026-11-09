@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { FaDemoVideo } from "@/app/fantasyapples/_components/FaDemoVideo";
 import { FaScreenshot } from "@/app/fantasyapples/_components/FaScreenshot";
 import { FeatureRow } from "@/components/FeatureRow";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { faArt } from "@/lib/cdn";
 import { FA_APP_URL, FA_LEGAL_LINKS } from "@/lib/faLinks";
 
 const DESCRIPTION =
-  "A free fantasy hockey companion for Yahoo Fantasy leagues. Every player rated by your league's scoring, every manager ranked.";
+  "A free fantasy hockey companion for fantasy leagues. Every player rated by your league's scoring, every manager ranked.";
 
 export const metadata: Metadata = {
   title: "Fantasy Apples",
@@ -34,7 +35,7 @@ export default function Page() {
           Fantasy hockey, by the numbers.
         </h1>
         <p className="text-subtle max-w-[42ch] text-lg sm:text-xl">
-          A companion for your Yahoo Fantasy league. Every player rated by your
+          A companion for your fantasy league. Every player rated by your
           league&rsquo;s own scoring, every manager ranked.
         </p>
         <Button
@@ -63,23 +64,29 @@ export default function Page() {
 
       <div className="mx-auto max-w-6xl px-5">
         <FeatureRow
-          title="Every player, rated."
+          title="The filters you've been looking for."
           wideMedia
           media={
-            <FaScreenshot
-              {...faArt.playersGrid}
-              alt="The Players grid: skaters ranked by a composite score, each stat cell shaded green above average and darker below"
+            <FaDemoVideo
+              {...faArt.filtersDemo}
+              label="filtering the Players grid in Fantasy Apples"
             />
           }
         >
           <p>
-            Every NHL skater and goalie, ranked against the stats your league
-            actually scores. Cells shade green above average, so a hot streak
-            jumps out of the grid.
+            Search free agency by forward line, defense pairing or power-play
+            unit. Find the starting goalies, or the tandem goalie that
+            didn&rsquo;t play their team&rsquo;s previous game.
           </p>
           <p className="mt-4">
-            Filter by position, NHL team or fantasy manager, and keep a
-            watchlist of the names you are eyeing.
+            Rank by per-game averages with a minimum games played, so a hot
+            three-game call-up doesn&rsquo;t top the list. Pick the days you
+            need covered this week and see only the players whose teams play
+            them.
+          </p>
+          <p className="mt-4">
+            Show who is in the top three of any stat, and bookmark a set of
+            filters to bring back with one tap.
           </p>
         </FeatureRow>
 
@@ -89,14 +96,14 @@ export default function Page() {
           media={
             <FaScreenshot
               {...faArt.playerCard}
-              alt="A player card for Leon Draisaitl: next game, manager, season totals, recent games and the Oilers' October schedule"
+              alt="A player card for Kyle Connor: upcoming games, a game log with this fantasy week highlighted, Winnipeg's record and its October schedule with results"
             />
           }
         >
           <p>
-            Tap a player for their next game, latest news, season totals, game
-            log and their team&rsquo;s schedule for the month. Home and away at
-            a glance.
+            Tap a player for their upcoming games, latest news and game log,
+            with this fantasy week highlighted. Their team&rsquo;s record and
+            month schedule, results included, sit underneath.
           </p>
         </FeatureRow>
 
@@ -120,19 +127,22 @@ export default function Page() {
         </FeatureRow>
 
         <FeatureRow
-          title="How your league stacks up."
+          title="Go head to head with any manager."
           mediaLeft
           media={
             <FaScreenshot
-              {...faArt.managersGrid}
-              alt="The Managers grid on a phone: each fantasy team's roster totals per stat, ranked and shaded against the league average"
+              {...faArt.managersCompare}
+              alt="Compare managers: two fantasy teams overlaid on one star chart, stat by stat, with their score, SD and composite ranks"
             />
           }
         >
           <p>
-            Every manager&rsquo;s roster added up stat by stat and ranked
-            against the league. Find out where you are thin before the trade
-            deadline does.
+            Lay two rosters over each other on one star chart, stat by stat, for
+            this week, the season or the last 15 to 90 days. Their ranks against
+            the league sit underneath.
+          </p>
+          <p className="mt-4">
+            Then see what each side is expected to put up in any fantasy week.
           </p>
         </FeatureRow>
 

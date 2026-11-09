@@ -25,19 +25,19 @@ define assert_export
 endef
 
 ### LOCAL DEV
-.PHONY: localdev
-localdev: ## Run the Next dev server
+.PHONY: local
+local: ## Run the Next dev server
 	npm run dev
 
 ### DEVELOPMENT
 # Build and publish to https://sil008-dev.web.app.
-.PHONY: dev build-dev deploy-dev
-dev: build-dev deploy-dev ## Build + deploy to sil008-dev
+.PHONY: deploy-dev build-dev deploy-dev-only
+deploy-dev: build-dev deploy-dev-only ## Build + deploy to sil008-dev
 
 build-dev: ## Clean static export (no deploy)
 	$(call web_build)
 
-deploy-dev: ## Deploy the current out/ to sil008-dev
+deploy-dev-only: ## Deploy the current out/ to sil008-dev
 	$(call assert_export,build-dev)
 	firebase deploy --only hosting:dev
 
@@ -45,13 +45,13 @@ deploy-dev: ## Deploy the current out/ to sil008-dev
 # Build and publish to https://sil008.web.app.
 # `preview-prod` puts the same build on a temporary channel instead — always the
 # last step before a DNS change (see README).
-.PHONY: prod build-prod deploy-prod preview-prod
-prod: build-prod deploy-prod ## Build + deploy to prod
+.PHONY: deploy-prod build-prod deploy-prod-only preview-prod
+deploy-prod: build-prod deploy-prod-only ## Build + deploy to prod
 
 build-prod: ## Clean static export (no deploy)
 	$(call web_build)
 
-deploy-prod: ## Deploy the current out/ to prod
+deploy-prod-only: ## Deploy the current out/ to prod
 	$(call assert_export,build-prod)
 	firebase deploy --only hosting:prod
 
@@ -86,9 +86,9 @@ deploy-cdn: pull-cdn ## Pull, record manifest, test, publish cdn/ art
 	@git diff --quiet -- cdn.manifest || echo "cdn.manifest changed -- commit it"
 
 ### CHECKS
-# Everything CI would run, if there were CI. `make check` before any deploy.
-.PHONY: check typecheck lint format-check test
-check: typecheck lint format-check test ## typecheck + lint + format-check + test
+# The full gate. Run before any deploy.
+.PHONY: test typecheck lint format-check test-unit
+test: typecheck lint format-check test-unit ## Full gate: typecheck + lint + format-check + unit tests
 
 typecheck: ## TypeScript typecheck
 	npm run typecheck
@@ -99,8 +99,13 @@ lint: ## ESLint
 format-check: ## Prettier check
 	npm run format:check
 
-test: ## Vitest run
-	npm run test:run
+test-unit: ## Vitest run (failures only)
+	@npm run --silent test:run -- --reporter=dot --silent
+
+# `make commit`, shared by every sil project (../sil_common/make/commit.mk).
+COMMIT_SPLIT := src public
+include ../sil_common/make/commit.mk
+include ../sil_common/make/standard.mk
 
 ### HELP
 # List every target tagged with a trailing `## description`, grouped under its

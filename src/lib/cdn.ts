@@ -152,17 +152,19 @@ export const habiScreens = {
  */
 export const faArt = {
   logo: { src: cdnUrl("fa_logo.png"), width: 720, height: 580 },
-  playersGrid: {
-    src: cdnUrl("fa_players_grid.png"),
-    width: 3406,
-    height: 1742,
+  /** An MP4; `poster` is a still at the same size. */
+  filtersDemo: {
+    src: cdnUrl("fa_filters_demo_crop.mp4"),
+    poster: cdnUrl("fa_filters_demo_crop_poster.jpg"),
+    width: 1824,
+    height: 1440,
   },
-  playerCard: { src: cdnUrl("fa_player_card.png"), width: 626, height: 1054 },
+  playerCard: { src: cdnUrl("fa_player_sheet.png"), width: 960, height: 1730 },
   playerStar: { src: cdnUrl("fa_player_star.png"), width: 932, height: 1558 },
-  managersGrid: {
-    src: cdnUrl("fa_managers_phone.jpg"),
+  managersCompare: {
+    src: cdnUrl("fa_managers_compare.png"),
     width: 960,
-    height: 1726,
+    height: 1730,
   },
   gridSettings: {
     src: cdnUrl("fa_grid_settings.png"),
