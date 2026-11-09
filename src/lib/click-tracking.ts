@@ -55,7 +55,7 @@ export function describeClickTarget(
   // `closest("a[href]")` can match an ancestor of a nested button, so test what
   // was actually found rather than assuming it is the anchor.
   if (element instanceof HTMLAnchorElement) {
-    params.link_url = truncate(element.href);
+    params.link_url = truncate(safeLinkUrl(element));
     // `hostname` is empty for mailto: and tel:, which never point at this site.
     params.outbound = element.hostname !== currentHost;
     return { name: "link_click", params };
@@ -68,10 +68,16 @@ export function describeClickTarget(
  * Most human-readable name available, in order of how deliberate it is:
  * explicit override, accessible name, visible text, tooltip, then for a link
  * with none of those, its path. An icon-only anchor reaches the last one.
+ *
+ * A mailto: or tel: link is labelled by kind, BEFORE its text and path: both
+ * can be the address itself, and analytics must never carry one.
  */
 function deriveLabel(element: Element): string {
   const candidates = [
     element.getAttribute("data-analytics-id"),
+    element instanceof HTMLAnchorElement && !isWebLink(element)
+      ? element.protocol.replace(":", "")
+      : undefined,
     element.getAttribute("aria-label"),
     element.textContent?.replace(/\s+/g, " ").trim(),
     element.getAttribute("title"),
@@ -103,6 +109,15 @@ function deriveArea(element: Element): string {
     if (AREA_TAGS.has(tag)) return tag;
   }
   return "page";
+}
+
+function isWebLink(link: HTMLAnchorElement): boolean {
+  return link.protocol === "http:" || link.protocol === "https:";
+}
+
+/** Where a link went, WITHOUT its query string, fragment or contact address. */
+function safeLinkUrl(link: HTMLAnchorElement): string {
+  return isWebLink(link) ? `${link.origin}${link.pathname}` : link.protocol;
 }
 
 function truncate(value: string): string {

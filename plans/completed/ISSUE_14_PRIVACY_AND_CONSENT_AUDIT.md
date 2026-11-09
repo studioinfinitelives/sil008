@@ -1,8 +1,8 @@
 ---
 issue: 14
 title: [Epic 12] Privacy and consent audit
-status: Task
-synced: Task
+status: Review
+synced: Review
 epic: 12
 item: PVTI_lADOBDBK484BiBnazhHCJ7I
 ---

@@ -83,6 +83,22 @@ describe("describeClickTarget", () => {
     expect(describeIn(html, "a")?.params.outbound).toBe(true);
   });
 
+  it.each([
+    ["mailto:hello@infinitelives.io", "hello@infinitelives.io", "mailto"],
+    ["tel:+15551234567", "+1 555 123 4567", "tel"],
+  ])("never reports the address in %s", (href, text, kind) => {
+    const result = describeIn(`<a href="${href}">${text}</a>`, "a");
+    expect(result?.params.label).toBe(kind);
+    expect(result?.params.link_url).toBe(`${kind}:`);
+  });
+
+  it("drops the query string and fragment from link_url", () => {
+    const html = `<a href="https://example.com/a?email=x@y.z#top">Go</a>`;
+    expect(describeIn(html, "a")?.params.link_url).toBe(
+      "https://example.com/a",
+    );
+  });
+
   it("falls back to a link's path when it has no words of its own", () => {
     const html = `<a href="/teamevl/rules"><svg></svg></a>`;
     expect(describeIn(html, "a")?.params.label).toBe("/teamevl/rules");

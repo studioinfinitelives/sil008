@@ -93,20 +93,23 @@ export function trackEvent(
   params: Record<string, string | number | boolean>,
 ): void {
   if (!isAnalyticsConfigured()) return;
-  window.gtag?.("event", name, params);
+  // On EVERY event: left unset, gtag.js attaches the full URL itself, query
+  // string included.
+  window.gtag?.("event", name, {
+    page_location: `${window.location.origin}${window.location.pathname}`,
+    ...params,
+  });
 }
 
 /**
  * Fired by hand for every route including the first, since `config` is
  * configured not to send one and Next's client router never triggers another.
  *
- * `page_location` comes from `window.location.href` rather than the route:
- * Hosting serves this export with `cleanUrls`, so the live URL is the only
- * correct answer.
+ * The path comes from `window.location` rather than the route: Hosting serves
+ * this export with `cleanUrls`, so the live URL is the only correct answer.
  */
 export function trackPageView(): void {
   trackEvent("page_view", {
-    page_location: window.location.href,
     page_path: window.location.pathname,
     page_title: document.title,
   });

@@ -40,13 +40,21 @@ build-dev: ## Clean static export (no deploy)
 deploy-dev-only: ## Deploy the current out/ to sil008-dev
 	$(call assert_export,build-dev)
 	firebase deploy --only hosting:dev
+	$(RECORD_DEV_DEPLOY)
 
 ### PRODUCTION
 # Build and publish to https://sil008.web.app.
 # `preview-prod` puts the same build on a temporary channel instead — always the
 # last step before a DNS change (see README).
 .PHONY: deploy-prod build-prod deploy-prod-only preview-prod
-deploy-prod: build-prod deploy-prod-only ## Build + deploy to prod
+deploy-prod: prep-deploy build-prod deploy-prod-only bump-version ## Release notes + build + deploy to prod, then raise the version
+	$(RECORD_PROD_DEPLOY)
+
+# Run only after a successful deploy: the notes written by prep-deploy are for
+# the NEXT version, so bumping earlier would leave a failed deploy mislabelled.
+.PHONY: bump-version
+bump-version:
+	python3 ../sil_common/tool/release_notes.py bump
 
 build-prod: ## Clean static export (no deploy)
 	$(call web_build)
@@ -54,6 +62,7 @@ build-prod: ## Clean static export (no deploy)
 deploy-prod-only: ## Deploy the current out/ to prod
 	$(call assert_export,build-prod)
 	firebase deploy --only hosting:prod
+	$(RECORD_PROD_DEPLOY)
 
 preview-prod: build-prod ## Build + deploy to the prod preview channel (7d)
 	$(call assert_export,build-prod)
@@ -88,7 +97,7 @@ deploy-cdn: pull-cdn ## Pull, record manifest, test, publish cdn/ art
 ### CHECKS
 # The full gate. Run before any deploy.
 .PHONY: test typecheck lint format-check test-unit
-test: typecheck lint format-check test-unit ## Full gate: typecheck + lint + format-check + unit tests
+test: check-legal typecheck lint format-check test-unit ## Full gate: typecheck + lint + format-check + unit tests
 
 typecheck: ## TypeScript typecheck
 	npm run typecheck
@@ -106,6 +115,11 @@ test-unit: ## Vitest run (failures only)
 COMMIT_SPLIT := src public
 include ../sil_common/make/commit.mk
 include ../sil_common/make/standard.mk
+
+# prep-deploy (release notes for the next version). The JSON is imported by
+# src/app/changelog/page.tsx.
+RELEASE_NOTES_FILE := src/content/release_notes.json
+include ../sil_common/make/release_notes.mk
 
 ### HELP
 # List every target tagged with a trailing `## description`, grouped under its

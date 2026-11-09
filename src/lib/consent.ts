@@ -13,7 +13,7 @@
 
 /**
  * Bump when the set of cookie categories materially changes; older stored
- * choices then re-prompt. Same idiom as `LEGAL_VERSION`.
+ * choices then re-prompt.
  */
 export const COOKIE_CONSENT_VERSION = 1;
 

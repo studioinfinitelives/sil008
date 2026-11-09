@@ -27,6 +27,7 @@ const routes: ReadonlyArray<
   { path: "/teamevl/howtoplay", changeFrequency: "yearly", priority: 0.6 },
   // The studio's own notice, distinct from Habi Sloth's.
   { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
+  { path: "/changelog", changeFrequency: "monthly", priority: 0.4 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.6 },
 ];
 

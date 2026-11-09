@@ -14,10 +14,7 @@ export const SITE_NAME = "Studio Infinite Lives";
 export const SITE_DESCRIPTION =
   "Studio Infinite Lives builds Habi Sloth, a habit tracker for the easy going, and Team EvL, a card game.";
 
-/**
- * The address named in the published Habi Sloth privacy policy. The old Flutter
- * site's `support@infinitelives.io` is legacy and deliberately not carried over.
- */
+/** General contact. Legal pages name `support@infinitelives.io` instead. */
 export const CONTACT_EMAIL = "hello@infinitelives.io";
 
 /**

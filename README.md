@@ -36,7 +36,7 @@ src/
     sitemap.ts  robots.ts
   components/               UI shared across route subtrees
     ui/                     shadcn/ui primitives
-  content/legal/            the studio's own privacy notice
+  content/                  release notes shown on the changelog page
   lib/                      site constants, CDN URLs, ported habit maths
 cdn/                        artwork, gitignored, published by `make deploy-cdn`
 ```
@@ -79,8 +79,8 @@ To make that impossible, the committed `cdn.manifest` lists every published
 file with its SHA-256. `make deploy-cdn` first pulls any listed file missing
 from `cdn/`, refuses if a listed file's bytes have changed, and adds new files
 to the manifest — commit `cdn.manifest` after the deploy. To retire a file,
-delete its manifest line and its `cdn/` copy. The sync script is shared with
-sil006: `../sil_common/tool/cdn_sync.py`.
+delete its manifest line and its `cdn/` copy. The sync script is in the shared
+package, `../sil_common/tool/cdn_sync.py`; sil006 does not use it yet.
 
 The one exception is the studio mark: browsers require site icons on the site's
 own origin, so `src/app/icon.svg` is committed, along with `favicon.ico` and

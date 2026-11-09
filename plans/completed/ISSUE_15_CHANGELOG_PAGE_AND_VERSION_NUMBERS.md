@@ -1,8 +1,8 @@
 ---
 issue: 15
 title: [Epic 12] Changelog page and version numbers
-status: Task
-synced: Task
+status: Review
+synced: Review
 epic: 12
 item: PVTI_lADOBDBK484BiBnazhHCKCE
 ---

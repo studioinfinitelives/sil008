@@ -33,8 +33,7 @@ import {
  *
  * The drift check compares files rather than published ETags, because the app's
  * REPO is the source of truth here: drift should fail when sil006 changes, not
- * when it deploys. The opposite of `legal.ts`, which must match what the app
- * SERVES. Skipped when `../sil006/cdn/` or this repo's `cdn/` is absent.
+ * when it deploys. Skipped when `../sil006/cdn/` or this repo's `cdn/` is absent.
  */
 
 const CDN_DIR = path.join(process.cwd(), "cdn");
