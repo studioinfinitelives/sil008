@@ -1,3 +1,28 @@
 {
-  "releases": []
+  "releases": [
+    {
+      "version": "0.1.1",
+      "build": 1,
+      "date": "2026-11-09",
+      "commit": "67d87c2b6932d55b0fcd75b62ae935e96f7dadcb",
+      "covers": [
+        "#10",
+        "#14",
+        "#15",
+        "Make the privacy page the only legal source and remove the markdown pipeline",
+        "Add voice guide",
+        "Record CDN deploys"
+      ],
+      "notes": [
+        {
+          "title": "New Changelog Page",
+          "body": "You can now see what's new on the site, newest first, on the **changelog page** at infinitelives.io/changelog."
+        },
+        {
+          "title": "Numbered Updates",
+          "body": "Each update to the site now has its own **version number and date**, so it's easy to tell what changed and when."
+        }
+      ]
+    }
+  ]
 }

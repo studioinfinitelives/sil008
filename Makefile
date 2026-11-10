@@ -92,6 +92,7 @@ deploy-cdn: pull-cdn ## Pull, record manifest, test, publish cdn/ art
 	$(CDN_SYNC) record --cdn-dir cdn --manifest cdn.manifest
 	npx vitest run src/lib/cdn.test.ts
 	firebase deploy --only hosting:sil-studio-art -P cdn --config firebase.cdn.json
+	$(RECORD_CDN_DEPLOY) prod
 	@git diff --quiet -- cdn.manifest || echo "cdn.manifest changed -- commit it"
 
 ### CHECKS
