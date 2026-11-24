@@ -25,9 +25,11 @@ define assert_export
 endef
 
 ### LOCAL DEV
-.PHONY: local
+.PHONY: local local-serve
 local: ## Run the Next dev server
 	npm run dev
+local-serve: ## Next dev server on 127.0.0.1:3000, for /local
+	npx next dev -H 127.0.0.1 -p 3000
 
 ### DEVELOPMENT
 # Build and publish to https://sil008-dev.web.app.

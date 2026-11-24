@@ -1,0 +1,6 @@
+{
+  "common": "v0.1.0",
+  "legal": { "surface": "site", "privacyPage": "src/app/privacy/page.tsx" },
+  "dev": {},
+  "ciFiles": []
+}

@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   // request-time route handlers and middleware. Every metadata route must
   // declare `export const dynamic = "force-static"` or the build fails.
   output: "export",
+  // Lets the home Mac's dev server answer over Tailscale (`/local`).
+  allowedDevOrigins: ["*.ts.net"],
   // Type-checks every internal `<Link href>` against the routes that exist, so
   // a dead internal link fails `tsc`. Stable as of Next 16.
   typedRoutes: true,

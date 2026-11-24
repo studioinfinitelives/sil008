@@ -19,7 +19,11 @@ export const EVL_BUY_URL = "https://www.thegamecrafter.com/games/team-evl";
 
 export const EVL_VIDEO_URL = "https://youtu.be/ecXGyscPgWw";
 
+/** The online game (`../sil011`). */
+export const EVL_PLAY_URL = "https://teamevl.com";
+
 export const evlLinks: readonly EvlLink[] = [
+  { kind: "external", href: EVL_PLAY_URL, label: "Play Online" },
   { kind: "external", href: EVL_BUY_URL, label: "Buy Online" },
   {
     kind: "external",

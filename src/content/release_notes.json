@@ -3,17 +3,20 @@
     {
       "version": "0.1.1",
       "build": 1,
-      "date": "2026-11-09",
-      "commit": "67d87c2b6932d55b0fcd75b62ae935e96f7dadcb",
+      "date": "2026-11-23",
+      "commit": "9c5080bc6e068654bc1a1f2d38e3e665fd7d9139",
       "covers": [
-        "#10",
-        "#14",
-        "#15",
-        "Make the privacy page the only legal source and remove the markdown pipeline",
-        "Add voice guide",
-        "Record CDN deploys"
+        "Record CDN deploys",
+        "#16",
+        "Add make local-serve and allow Tailscale dev origins",
+        "Turn off Node's own localStorage in the test workers so jsdom's is used on Node 25+",
+        "Add sil.json"
       ],
       "notes": [
+        {
+          "title": "Team EvL Online",
+          "body": "The **Team EvL page** now announces the online game, with a new sticker and a section about it."
+        },
         {
           "title": "New Changelog Page",
           "body": "You can now see what's new on the site, newest first, on the **changelog page** at infinitelives.io/changelog."

@@ -104,6 +104,22 @@ export const evlArt = {
   peek: { src: cdnUrl("evl_howtoplay_peek.gif"), width: 1000, height: 400 },
   draw: { src: cdnUrl("evl_howtoplay_draw.gif"), width: 1000, height: 400 },
   heal: { src: cdnUrl("evl_howtoplay_heal.gif"), width: 1000, height: 400 },
+  /**
+   * The online game (`../sil011`), captured at 390×844 @2x by that repo's
+   * `make shots` and re-encoded as JPEG. A newer capture is a new filename.
+   */
+  onlineLobby: {
+    src: cdnUrl("evl_online_lobby.jpg"),
+    width: 780,
+    height: 1688,
+  },
+  onlineTable: {
+    src: cdnUrl("evl_online_table.jpg"),
+    width: 780,
+    height: 1688,
+  },
+  onlinePeek: { src: cdnUrl("evl_online_peek.jpg"), width: 780, height: 1688 },
+  onlineWin: { src: cdnUrl("evl_online_win.jpg"), width: 780, height: 1688 },
 } as const;
 
 /** The game's own mark. Currently unrendered; `cardArt.teamevl` is the hub card. */

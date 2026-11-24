@@ -4,6 +4,8 @@ import { EvlArt } from "@/app/teamevl/_components/EvlArt";
 import { EvlBloomsFlourish } from "@/app/teamevl/_components/EvlBloomsFlourish";
 import { EvlCallToAction } from "@/app/teamevl/_components/EvlCallToAction";
 import { EvlLinkDrawer } from "@/app/teamevl/_components/EvlLinkDrawer";
+import { EvlNewSticker } from "@/app/teamevl/_components/EvlNewSticker";
+import { EvlOnlineSection } from "@/app/teamevl/_components/EvlOnlineSection";
 import { EvlPhotoCarousel } from "@/app/teamevl/_components/EvlPhotoCarousel";
 import { FeatureRow } from "@/components/FeatureRow";
 import { evlArt } from "@/lib/cdn";
@@ -45,7 +47,12 @@ export default function Page() {
         The width cap sits on the children, not the section, so the hero art can
         run wider than the copy while both stay centred on the same axis.
       */}
-      <section className="flex flex-col items-center gap-6 px-5 py-20 text-center sm:py-28">
+      <section className="relative flex flex-col items-center gap-6 px-5 py-20 text-center sm:py-28">
+        {/*
+          In the column on narrow screens; from `lg` it leaves the flow for the
+          corner, where the centred copy never reaches.
+        */}
+        <EvlNewSticker className="lg:absolute lg:top-6 lg:right-[max(1.5rem,calc(50%-34rem))]" />
         {/*
           No `text-balance` on the h1 below: the manual break after "game" is
           intended, and balancing would pull words off the first line even when
@@ -84,6 +91,8 @@ export default function Page() {
         </div>
         <EvlCallToAction area="hero" />
       </section>
+
+      <EvlOnlineSection />
 
       <div className="mx-auto max-w-6xl px-5">
         {/* The alternation starts here: every row below flips `mediaLeft`. */}

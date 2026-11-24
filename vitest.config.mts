@@ -5,6 +5,9 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "jsdom",
+    // Node 25+ ships its own global localStorage, undefined without
+    // --localstorage-file, and it shadows the one jsdom provides.
+    execArgv: ["--no-experimental-webstorage"],
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
