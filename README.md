@@ -92,16 +92,19 @@ Apple — iOS composites transparency onto black).
 
 ## Deploying
 
-Everything goes through the `Makefile`, which mirrors `../sil006/Makefile`.
+Work on `dev`. Deploys run in GitHub Actions on the studio's home Mac (see
+`../docs/CI.md`): `/dev sil008` commits, pushes `dev` and deploys
+<https://sil008-dev.web.app>; `/prod sil008` writes release notes, bumps the
+patch version and ships to <https://infinitelives.io>. `master` moves only
+through `/prod`. The `Makefile` mirrors `../sil006/Makefile` for the rest:
 
-| Command             | What it does                                  |
-| ------------------- | --------------------------------------------- |
-| `make check`        | typecheck, lint, format check, tests          |
-| `make deploy-dev`   | build + deploy → <https://sil008-dev.web.app> |
-| `make prod`         | build + deploy → <https://sil008.web.app>     |
-| `make preview-prod` | production build on a 7-day preview channel   |
-| `make pull-cdn`     | fill `cdn/` from the live host (fresh clone)  |
-| `make deploy-cdn`   | publish `cdn/` artwork, no site build         |
+| Command             | What it does                                 |
+| ------------------- | -------------------------------------------- |
+| `make test`         | typecheck, lint, format check, tests         |
+| `make build`        | clean static export into `out/`              |
+| `make preview-prod` | production build on a 7-day preview channel  |
+| `make pull-cdn`     | fill `cdn/` from the live host (fresh clone) |
+| `make deploy-cdn`   | publish `cdn/` artwork, no site build        |
 
 Both Hosting sites live in the one `sil008` Firebase project (see `.firebaserc`,
 which maps the `dev` and `prod` deploy targets onto them). The dev site is

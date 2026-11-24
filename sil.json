@@ -2,5 +2,21 @@
   "common": "v0.1.0",
   "legal": { "surface": "site", "privacyPage": "src/app/privacy/page.tsx" },
   "dev": {},
+  "releaseNotes": "src/content/release_notes.json",
+  "deploy": {
+    "dev": {
+      "project": "sil008",
+      "only": "hosting:dev",
+      "build": "make build",
+      "url": "https://sil008-dev.web.app"
+    },
+    "prod": {
+      "project": "sil008",
+      "only": "hosting:prod",
+      "build": "make build",
+      "url": "https://infinitelives.io"
+    }
+  },
+  "smoke": { "paths": ["/", "/privacy", "/teamevl"], "version": false },
   "ciFiles": []
 }

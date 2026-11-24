@@ -1,0 +1,24 @@
+# Ships a dev commit to prod: run by /prod sil008. Shell only; the logic is sil_common's tool/ci/.
+# Never add a pull_request trigger (self-hosted runner; make doctor enforces it).
+name: promote
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Commit on dev to ship (default the dev head)
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: write
+  deployments: write
+  statuses: write
+
+jobs:
+  promote:
+    uses: studioinfinitelives/sil_common/.github/workflows/promote.yml@ci-v1
+    with:
+      sha: ${{ inputs.sha }}
+    secrets: inherit

@@ -1,0 +1,24 @@
+# Redeploys an earlier release to prod. Master does not move. Shell only; the logic is sil_common's tool/ci/.
+# Never add a pull_request trigger (self-hosted runner; make doctor enforces it).
+name: rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to redeploy (default the one before the latest)
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+  deployments: write
+  statuses: write
+
+jobs:
+  rollback:
+    uses: studioinfinitelives/sil_common/.github/workflows/rollback.yml@ci-v1
+    with:
+      tag: ${{ inputs.tag }}
+    secrets: inherit

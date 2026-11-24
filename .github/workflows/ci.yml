@@ -1,0 +1,23 @@
+# Checks on every push to dev, then the dev deploy. Shell only: the logic is sil_common's tool/ci/ at the tag in sil.json.
+# Never add a pull_request trigger: this runs on a self-hosted machine (make doctor enforces it).
+name: ci
+
+on:
+  push:
+    branches: [dev]
+    paths-ignore:
+      - "plans/**"
+      - "docs/**"
+      - "**.md"
+      - "next_steps/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+  statuses: write
+
+jobs:
+  ci:
+    uses: studioinfinitelives/sil_common/.github/workflows/ci.yml@ci-v1
+    secrets: inherit

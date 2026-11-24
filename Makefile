@@ -16,14 +16,6 @@ define web_build
 rm -rf out && npm run build
 endef
 
-# The flavor guard that used to live here greped for the per-flavor CDN host --
-# the only thing that told a dev export from a prod one. With one shared host
-# there is nothing left to discriminate on, so all that remains is a staleness
-# check. $(1) = target to re-run.
-define assert_export
-@test -f out/index.html || { echo "ABORT: no out/ -- run 'make $(1)' first"; exit 1; }
-endef
-
 ### LOCAL DEV
 .PHONY: local local-serve
 local: ## Run the Next dev server
@@ -31,43 +23,15 @@ local: ## Run the Next dev server
 local-serve: ## Next dev server on 127.0.0.1:3000, for /local
 	npx next dev -H 127.0.0.1 -p 3000
 
-### DEVELOPMENT
-# Build and publish to https://sil008-dev.web.app.
-.PHONY: deploy-dev build-dev deploy-dev-only
-deploy-dev: build-dev deploy-dev-only ## Build + deploy to sil008-dev
-
-build-dev: ## Clean static export (no deploy)
+### BUILD
+# Deploys run in GitHub Actions (sil.json `deploy`, see ../docs/CI.md): `/dev sil008`
+# for the dev site, `/prod sil008` for prod. CI builds with this target.
+.PHONY: build preview-prod
+build: ## Clean static export (no deploy)
 	$(call web_build)
 
-deploy-dev-only: ## Deploy the current out/ to sil008-dev
-	$(call assert_export,build-dev)
-	firebase deploy --only hosting:dev
-	$(RECORD_DEV_DEPLOY)
-
-### PRODUCTION
-# Build and publish to https://sil008.web.app.
-# `preview-prod` puts the same build on a temporary channel instead — always the
-# last step before a DNS change (see README).
-.PHONY: deploy-prod build-prod deploy-prod-only preview-prod
-deploy-prod: prep-deploy build-prod deploy-prod-only bump-version ## Release notes + build + deploy to prod, then raise the version
-	$(RECORD_PROD_DEPLOY)
-
-# Run only after a successful deploy: the notes written by prep-deploy are for
-# the NEXT version, so bumping earlier would leave a failed deploy mislabelled.
-.PHONY: bump-version
-bump-version:
-	python3 ../sil_common/tool/release_notes.py bump
-
-build-prod: ## Clean static export (no deploy)
-	$(call web_build)
-
-deploy-prod-only: ## Deploy the current out/ to prod
-	$(call assert_export,build-prod)
-	firebase deploy --only hosting:prod
-	$(RECORD_PROD_DEPLOY)
-
-preview-prod: build-prod ## Build + deploy to the prod preview channel (7d)
-	$(call assert_export,build-prod)
+# Puts the same build on a temporary channel: always the last step before a DNS change (see README).
+preview-prod: build ## Build + deploy to the prod preview channel (7d)
 	firebase hosting:channel:deploy preview --only prod --expires 7d
 
 ### CDN
@@ -90,7 +54,7 @@ pull-cdn: ## Fetch manifest-listed files missing from cdn/
 	@test -d ../sil_common || { echo "ABORT: ../sil_common not found"; exit 1; }
 	$(CDN_SYNC) pull --cdn-dir cdn --manifest cdn.manifest --host $(CDN_HOST)
 
-deploy-cdn: pull-cdn ## Pull, record manifest, test, publish cdn/ art
+deploy-cdn: pull-cdn test ## Pull, test, record manifest, publish cdn/ art
 	$(CDN_SYNC) record --cdn-dir cdn --manifest cdn.manifest
 	npx vitest run src/lib/cdn.test.ts
 	firebase deploy --only hosting:sil-studio-art -P cdn --config firebase.cdn.json
@@ -119,7 +83,7 @@ COMMIT_SPLIT := src public
 include ../sil_common/make/commit.mk
 include ../sil_common/make/standard.mk
 
-# prep-deploy (release notes for the next version). The JSON is imported by
+# prep-deploy (release notes for the next version, run by /prod). The JSON is imported by
 # src/app/changelog/page.tsx.
 RELEASE_NOTES_FILE := src/content/release_notes.json
 include ../sil_common/make/release_notes.mk
