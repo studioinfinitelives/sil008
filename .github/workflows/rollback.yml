@@ -1,4 +1,6 @@
-# Redeploys an earlier release to prod. Master does not move. Shell only; the logic is sil_common's tool/ci/.
+# Redeploys an earlier release to prod. Master does not move. The logic is sil_common's tool/ci/.
+# INLINE COPY of sil_common/.github/workflows/rollback.yml: a public repo cannot call a private repo's
+# reusable workflow. Keep the steps in step with that file.
 # Never add a pull_request trigger (self-hosted runner; make doctor enforces it).
 name: rollback
 
@@ -18,7 +20,43 @@ permissions:
 
 jobs:
   rollback:
-    uses: studioinfinitelives/sil_common/.github/workflows/rollback.yml@ci-v1
-    with:
-      tag: ${{ inputs.tag }}
-    secrets: inherit
+    runs-on: [self-hosted, home-mac]
+    concurrency:
+      group: deploy-${{ github.repository }}-prod
+      cancel-in-progress: false
+    env:
+      NAME: ${{ github.event.repository.name }}
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      HC_PING: ${{ secrets.HC_PING_PROD }}
+      WANTED_TAG: ${{ inputs.tag }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          path: ${{ github.event.repository.name }}
+          clean: true
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Check out the release and its sil_common pin
+        run: |
+          tag="$WANTED_TAG"
+          [ -n "$tag" ] || tag="$(git -C "$NAME" tag --list 'v*' --sort=-v:refname | sed -n 2p)"
+          [ -n "$tag" ] || { echo "no earlier release to roll back to" >&2; exit 1; }
+          git -C "$NAME" checkout --detach "$tag"
+          echo "SHA=$(git -C "$NAME" rev-parse HEAD)" >> "$GITHUB_ENV"
+          common="$(jq -r .common "$NAME/sil.json")"
+          rm -rf sil_common
+          git clone --depth 1 --branch "$common" git@github.com:studioinfinitelives/sil_common.git sil_common
+      - name: Copy ciFiles
+        run: |
+          bash sil_common/tool/ci/setup.sh "$NAME"
+          bash sil_common/tool/ci/files.sh "$NAME" copy
+      - name: Deploy to prod
+        run: bash sil_common/tool/ci/deploy.sh "$NAME" prod
+      - name: Smoke test
+        run: bash sil_common/tool/ci/smoke.sh "$NAME" prod
+      - name: Record the deploy
+        run: bash sil_common/tool/ci/record.sh "$NAME" prod success
+      - name: Remove ciFiles
+        if: always()
+        run: bash sil_common/tool/ci/files.sh "$NAME" clean

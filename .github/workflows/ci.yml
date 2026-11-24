@@ -1,4 +1,6 @@
-# Checks on every push to dev, then the dev deploy. Shell only: the logic is sil_common's tool/ci/ at the tag in sil.json.
+# Checks on every push to dev, then the dev deploy. The logic is sil_common's tool/ci/ at the tag in sil.json.
+# INLINE COPY of sil_common/.github/workflows/ci.yml: a public repo cannot call a private repo's
+# reusable workflow. Keep the steps in step with that file.
 # Never add a pull_request trigger: this runs on a self-hosted machine (make doctor enforces it).
 name: ci
 
@@ -18,6 +20,84 @@ permissions:
   statuses: write
 
 jobs:
-  ci:
-    uses: studioinfinitelives/sil_common/.github/workflows/ci.yml@ci-v1
-    secrets: inherit
+  checks:
+    runs-on: [self-hosted, home-mac]
+    concurrency:
+      group: ci-${{ github.repository }}-${{ github.ref }}
+      cancel-in-progress: true
+    outputs:
+      deploy_dev: ${{ steps.plan.outputs.deploy_dev }}
+    env:
+      NAME: ${{ github.event.repository.name }}
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      SHA: ${{ github.sha }}
+      BEFORE: ${{ github.event.before }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          path: ${{ github.event.repository.name }}
+          clean: true
+          fetch-depth: 0
+      - name: Fetch sil_common at the pinned tag
+        run: |
+          common="$(jq -r .common "$NAME/sil.json")"
+          rm -rf sil_common
+          git clone --depth 1 --branch "$common" git@github.com:studioinfinitelives/sil_common.git sil_common
+      - name: Verify tools and copy ciFiles
+        run: |
+          bash sil_common/tool/ci/setup.sh "$NAME"
+          bash sil_common/tool/ci/files.sh "$NAME" copy
+      - name: Checks
+        run: bash sil_common/tool/ci/checks.sh "$NAME"
+      - name: Mark checks passed
+        run: gh api "repos/$REPO/statuses/$SHA" -f state=success -f context=checks-passed
+      - name: Plan the dev deploy
+        id: plan
+        run: |
+          deploy=false
+          if [ "${{ github.ref }}" = "refs/heads/dev" ] \
+            && python3 sil_common/tool/ci/config.py "$NAME" has dev \
+            && python3 sil_common/tool/ci/config.py "$NAME" has deploy.dev; then
+            deploy=true
+          fi
+          echo "deploy_dev=$deploy" >> "$GITHUB_OUTPUT"
+      - name: Remove ciFiles
+        if: always()
+        run: bash sil_common/tool/ci/files.sh "$NAME" clean
+
+  deploy-dev:
+    needs: checks
+    if: needs.checks.outputs.deploy_dev == 'true'
+    runs-on: [self-hosted, home-mac]
+    concurrency:
+      group: deploy-${{ github.repository }}-dev
+      cancel-in-progress: false
+    env:
+      NAME: ${{ github.event.repository.name }}
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      SHA: ${{ github.sha }}
+      HC_PING: ${{ secrets.HC_PING_DEV }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          path: ${{ github.event.repository.name }}
+          clean: true
+          fetch-depth: 0
+      - name: Fetch sil_common at the pinned tag
+        run: |
+          common="$(jq -r .common "$NAME/sil.json")"
+          rm -rf sil_common
+          git clone --depth 1 --branch "$common" git@github.com:studioinfinitelives/sil_common.git sil_common
+      - name: Copy ciFiles
+        run: bash sil_common/tool/ci/files.sh "$NAME" copy
+      - name: Deploy to dev
+        run: bash sil_common/tool/ci/deploy.sh "$NAME" dev
+      - name: Smoke test
+        run: bash sil_common/tool/ci/smoke.sh "$NAME" dev
+      - name: Record the deploy
+        run: bash sil_common/tool/ci/record.sh "$NAME" dev success
+      - name: Remove ciFiles
+        if: always()
+        run: bash sil_common/tool/ci/files.sh "$NAME" clean
