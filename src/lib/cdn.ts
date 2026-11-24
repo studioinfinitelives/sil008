@@ -20,7 +20,27 @@
  */
 const CDN_HOST = "https://cdn.infinitelives.io";
 
+/**
+ * Where `next dev` serves the local `cdn/` folder: `make local` links it into
+ * `public/` (`../sil_common/make/cdn.mk`). `make build` removes the link, so the
+ * art never ships inside the site.
+ */
+const LOCAL_CDN_PATH = "/_cdn";
+
+/** The `cdn/` listing from `next.config.ts`: empty in every build. */
+const localCdnFiles = new Set(
+  (process.env.LOCAL_CDN_FILES ?? "").split(",").filter(Boolean),
+);
+
+/**
+ * In local dev a file present in `cdn/` is served from there, so new art shows
+ * before `make deploy-cdn` publishes it for good. Everything else, and every
+ * build, uses the CDN host.
+ */
 export function cdnUrl(fileName: string): string {
+  if (localCdnFiles.has(fileName)) {
+    return `${LOCAL_CDN_PATH}/${fileName}`;
+  }
   return `${CDN_HOST}/${fileName}`;
 }
 
@@ -120,6 +140,19 @@ export const evlArt = {
   },
   onlinePeek: { src: cdnUrl("evl_online_peek.jpg"), width: 780, height: 1688 },
   onlineWin: { src: cdnUrl("evl_online_win.jpg"), width: 780, height: 1688 },
+  onlinePlay: { src: cdnUrl("evl_online_play.jpg"), width: 780, height: 1688 },
+  onlineEmotes: {
+    src: cdnUrl("evl_online_emotes.jpg"),
+    width: 780,
+    height: 1688,
+  },
+  onlineChallenge: {
+    src: cdnUrl("evl_online_challenge.jpg"),
+    width: 780,
+    height: 1688,
+  },
+  onlineCall: { src: cdnUrl("evl_online_call.jpg"), width: 780, height: 1688 },
+  onlineFour: { src: cdnUrl("evl_online_four.jpg"), width: 780, height: 1688 },
 } as const;
 
 /** The game's own mark. Currently unrendered; `cardArt.teamevl` is the hub card. */

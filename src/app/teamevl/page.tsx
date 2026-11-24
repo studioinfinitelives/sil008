@@ -92,8 +92,6 @@ export default function Page() {
         <EvlCallToAction area="hero" />
       </section>
 
-      <EvlOnlineSection />
-
       <div className="mx-auto max-w-6xl px-5">
         {/* The alternation starts here: every row below flips `mediaLeft`. */}
         <FeatureRow title="Human played" media={<EvlPhotoCarousel />}>
@@ -196,7 +194,10 @@ export default function Page() {
         </FeatureRow>
       </div>
 
-      <section className="bg-surface-alt mt-10 px-5 py-20 text-center sm:py-24">
+      {/* Second to last: the online game's one section; the rest is /teamevl/online. */}
+      <EvlOnlineSection />
+
+      <section className="bg-surface-alt px-5 py-20 text-center sm:py-24">
         {/*
           `EvlArt` centres itself; the wrapper only caps its width in a section
           that is otherwise full-bleed. `max-w-3xl` is 768px, the largest round

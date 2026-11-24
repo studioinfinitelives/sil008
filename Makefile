@@ -12,15 +12,21 @@
 
 # `out/` is ALWAYS removed first: Next does not purge the export directory, so a
 # file dropped from the site would otherwise keep shipping from a stale build.
+#
+# public/_cdn (the local art link, see LOCAL DEV) is ALWAYS removed first too: a
+# build copies public/, so the link would ship unpublished art inside the site.
 define web_build
-rm -rf out && npm run build
+rm -f public/_cdn && rm -rf out && npm run build
 endef
 
 ### LOCAL DEV
+# Local dev serves art from cdn/ when the file is there, so new art shows before
+# `make deploy-cdn` (src/lib/cdn.ts). Files not in cdn/ come from the CDN host.
+CDN_LINK := public/_cdn
 .PHONY: local local-serve
-local: ## Run the Next dev server
+local: cdn-link ## Run the Next dev server
 	npm run dev
-local-serve: ## Next dev server on 127.0.0.1:3000, for /local
+local-serve: cdn-link ## Next dev server on 127.0.0.1:3000, for /local
 	npx next dev -H 127.0.0.1 -p 3000
 
 ### BUILD
@@ -82,6 +88,7 @@ test-unit: ## Vitest run (failures only)
 COMMIT_SPLIT := src public
 include ../sil_common/make/commit.mk
 include ../sil_common/make/standard.mk
+include ../sil_common/make/cdn.mk
 
 # prep-deploy (release notes for the next version, run by /prod). The JSON is imported by
 # src/app/changelog/page.tsx.

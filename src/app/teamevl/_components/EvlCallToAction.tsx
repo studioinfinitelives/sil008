@@ -1,13 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { EVL_BUY_URL } from "@/lib/evlLinks";
+import { EVL_BUY_URL, EVL_PLAY_URL } from "@/lib/evlLinks";
 import { currentRulebook } from "@/lib/rulebooks";
 
 /** Shared by every Team EvL call to action, so the buttons cannot drift apart. */
 export const CTA_BUTTON =
   "h-13 rounded-full px-8 text-base font-bold tracking-wide uppercase";
 
+/** The gold button of the online game, for use under `data-section="evlonline"`. */
+export const ONLINE_BUTTON = "bg-brand text-on-brand hover:bg-brand/85";
+
 /**
- * Buy button with the rulebook beside it.
+ * Buy button with the rulebook and the online game's tutorial beside it.
  *
  * Resolves whichever edition is current, so a new printing changes
  * `lib/rulebooks.ts` and nothing else. The PDF is off-site, hence a plain
@@ -35,6 +38,9 @@ export function EvlCallToAction({
         <a href={currentRulebook.url} target="_blank" rel="noreferrer">
           Download Rules
         </a>
+      </Button>
+      <Button asChild size="lg" variant="outline" className={CTA_BUTTON}>
+        <a href={EVL_PLAY_URL}>Online Tutorial</a>
       </Button>
     </div>
   );

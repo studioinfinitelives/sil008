@@ -62,6 +62,13 @@
   --color-evl-gold: #d8b162; /* the gold element card */
   --color-evl-blood: #94354b; /* the red element card */
 
+  /* Team EvL Online, transcribed one-way from sil011: `web/index.html` (the
+     loading page) and `lib/theme/app_theme.dart`. A copy, never a source. */
+  --color-evl-splash: #ffc20e; /* the loading page */
+  --color-evl-night: #0b0b0e; /* the app's background */
+  --color-evl-online-gold: #f0c35a;
+  --color-evl-online-on-gold: #1a1405;
+
   /* Fantasy Apples, transcribed one-way from sil009/lib/theme/app_theme.dart.
      This file is a copy, never a source — the app owns these values. */
   --color-fa-navy: #0b2545; /* primary, light */
@@ -279,6 +286,27 @@
   --color-brand-bright: #c9a6e0;
   --color-on-brand: #140e17; /* 9.40 on the gold */
   --color-on-brand-bright: #140e17; /* 9.06 */
+}
+
+/* ── Team EvL Online ──────────────────────────────────────────────────────
+   The app's black and gold in BOTH themes: the game has no light mode, so
+   there is deliberately no `.dark` twin. Nests inside the Team EvL section.
+   Verified on the canvas: ink 17.0, subtle 9.0, link 11.7; on-brand on the
+   gold 11.0. */
+[data-section="evlonline"] {
+  --color-canvas: var(--color-evl-night);
+  --color-surface: #17171c;
+  --color-surface-alt: #111115;
+  --color-line: #2e2b35;
+
+  --color-ink: #f4efe6;
+  --color-subtle: #b5afa6;
+  --color-link: var(--color-evl-online-gold);
+
+  --color-brand: var(--color-evl-online-gold);
+  --color-brand-bright: var(--color-evl-splash);
+  --color-on-brand: var(--color-evl-online-on-gold);
+  --color-on-brand-bright: var(--color-evl-night);
 }
 
 /* ── Fantasy Apples, light ────────────────────────────────────────────────

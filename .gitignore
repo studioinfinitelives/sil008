@@ -56,3 +56,7 @@ next-env.d.ts
 # under here may be committed. Once a file is on the CDN, delete it from
 # `public/` and point the constant in `src/lib/cdn.ts` at the CDN URL.
 /public/site_*
+
+# `make local` links cdn/ here so local dev can show unpublished art
+# (../sil_common/make/cdn.mk). NEVER COMMIT IT, for the same reason as cdn/.
+/public/_cdn

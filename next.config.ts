@@ -1,6 +1,18 @@
+import { existsSync, readdirSync } from "node:fs";
 import type { NextConfig } from "next";
 
+/**
+ * The files in `cdn/` when `next dev` starts, which `cdnUrl` then serves locally
+ * (`src/lib/cdn.ts`). EMPTY FOR EVERY BUILD: a build must only ever point at the
+ * CDN host. Read once, so art added while the server runs needs a restart.
+ */
+const localCdnFiles =
+  process.env.NODE_ENV === "development" && existsSync("cdn")
+    ? readdirSync("cdn").join(",")
+    : "";
+
 const nextConfig: NextConfig = {
+  env: { LOCAL_CDN_FILES: localCdnFiles },
   // Static export: Firebase Hosting serves `out/` as plain files. Costs ISR,
   // request-time route handlers and middleware. Every metadata route must
   // declare `export const dynamic = "force-static"` or the build fails.

@@ -21,6 +21,7 @@ const routes: ReadonlyArray<
   { path: "/habisloth", changeFrequency: "monthly", priority: 0.9 },
   { path: "/teamevl", changeFrequency: "monthly", priority: 0.9 },
   { path: "/fantasyapples", changeFrequency: "monthly", priority: 0.9 },
+  { path: "/teamevl/online", changeFrequency: "monthly", priority: 0.8 },
   // Listed directly rather than left to be found through the product page:
   // this is what a search for "Team EvL rules" wants.
   { path: "/teamevl/rules", changeFrequency: "yearly", priority: 0.5 },

@@ -11,7 +11,8 @@ const BURST = Array.from({ length: POINTS * 2 }, (_, i) => {
 }).join(" ");
 
 /**
- * The "New" burst sticker announcing the online game, linking to it.
+ * The "New" burst sticker announcing the online game, linking to it. Yellow
+ * and black, as the teamevl.com loading page, in both themes.
  *
  * Every animation is `motion-safe:`. The blanket reduced-motion rule in
  * `globals.css` only shortens durations, and an infinite spin shortened to
@@ -32,20 +33,20 @@ export function EvlNewSticker({ className }: { className?: string }) {
       <svg
         viewBox="0 0 100 100"
         aria-hidden="true"
-        className="fill-evl-blood absolute inset-0 size-full drop-shadow-lg motion-safe:animate-[spin_24s_linear_infinite]"
+        className="fill-evl-splash absolute inset-0 size-full drop-shadow-lg motion-safe:animate-[spin_24s_linear_infinite]"
       >
         <polygon points={BURST} />
         <circle
           cx="50"
           cy="50"
           r="35"
-          className="stroke-evl-gold fill-none"
+          className="stroke-evl-night fill-none"
           strokeWidth="0.8"
           strokeDasharray="2 2"
         />
       </svg>
-      <span className="relative flex -rotate-12 flex-col items-center leading-none text-white transition-transform group-hover:scale-110">
-        <span className="text-evl-gold text-3xl font-black tracking-tight uppercase sm:text-4xl">
+      <span className="text-evl-night relative flex -rotate-12 flex-col items-center leading-none transition-transform group-hover:scale-110">
+        <span className="text-3xl font-black tracking-tight uppercase sm:text-4xl">
           New!
         </span>
         <span className="mt-1 text-[0.7rem] font-bold tracking-wider uppercase sm:text-xs">
