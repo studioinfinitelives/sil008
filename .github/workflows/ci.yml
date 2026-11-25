@@ -22,6 +22,7 @@ permissions:
 jobs:
   checks:
     runs-on: [self-hosted, home-mac]
+    timeout-minutes: 30
     concurrency:
       group: ci-${{ github.repository }}-${{ github.ref }}
       cancel-in-progress: true
@@ -57,16 +58,19 @@ jobs:
         id: plan
         run: |
           deploy=false
-          if [ "${{ github.ref }}" = "refs/heads/dev" ] \
+          if [ "$GITHUB_REF" = "refs/heads/dev" ] \
             && python3 sil_common/tool/ci/config.py "$NAME" has dev \
             && python3 sil_common/tool/ci/config.py "$NAME" has deploy.dev; then
             deploy=true
           fi
           echo "deploy_dev=$deploy" >> "$GITHUB_OUTPUT"
-          # Terraform runs only when this push touched infra/ (a new or unreachable BEFORE counts as touched).
+          # Terraform runs only when this push touched infra/. NO PUSHED RANGE (a manual run, a new branch)
+          # MEANS NO APPLY: an unattended run must never apply with --allow-delete on a guess.
           terraform=false
-          if [ "$deploy" = true ] && [ -f "$NAME/infra/terraform/envs/dev.tfvars" ]; then
-            if ! git -C "$NAME" diff --quiet "$BEFORE" "$SHA" -- infra 2>/dev/null; then terraform=true; fi
+          if [ "$deploy" = true ] && [ -f "$NAME/infra/terraform/envs/dev.tfvars" ] \
+            && git -C "$NAME" cat-file -e "$BEFORE^{commit}" 2>/dev/null \
+            && ! git -C "$NAME" diff --quiet "$BEFORE" "$SHA" -- infra; then
+            terraform=true
           fi
           echo "terraform_dev=$terraform" >> "$GITHUB_OUTPUT"
       - name: Remove ciFiles
@@ -77,6 +81,7 @@ jobs:
     needs: checks
     if: needs.checks.outputs.terraform_dev == 'true'
     runs-on: [self-hosted, home-mac]
+    timeout-minutes: 30
     concurrency:
       group: terraform-${{ github.repository }}-dev
       cancel-in-progress: false
@@ -85,6 +90,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
       SHA: ${{ github.sha }}
+      HC_PING: ${{ secrets.HC_PING_DEV }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -102,6 +108,14 @@ jobs:
           bash sil_common/tool/ci/files.sh "$NAME" copy
       - name: Apply Terraform to dev
         run: bash sil_common/tool/ci/terraform.sh "$NAME" dev apply --allow-delete
+      - name: Ping failure
+        # Inline, not ping.sh: a rollback runs an older sil_common that may not have it.
+        # Not being signed in today is not an alert (deploy.sh and terraform.sh leave the marker).
+        if: failure()
+        run: |
+          [ -n "$HC_PING" ] || exit 0
+          [ -f "$RUNNER_TEMP/sil-not-signed-in" ] && exit 0
+          curl -fsS -m 15 --retry 3 "$HC_PING/fail" >/dev/null || true
       - name: Remove ciFiles
         if: always()
         run: bash sil_common/tool/ci/files.sh "$NAME" clean
@@ -110,6 +124,7 @@ jobs:
     needs: [checks, terraform-dev]
     if: ${{ !cancelled() && needs.checks.result == 'success' && needs.checks.outputs.deploy_dev == 'true' && needs.terraform-dev.result != 'failure' }}
     runs-on: [self-hosted, home-mac]
+    timeout-minutes: 45
     concurrency:
       group: deploy-${{ github.repository }}-dev
       cancel-in-progress: false
@@ -138,6 +153,17 @@ jobs:
         run: bash sil_common/tool/ci/smoke.sh "$NAME" dev
       - name: Record the deploy
         run: bash sil_common/tool/ci/record.sh "$NAME" dev success
+      - name: Ping success
+        if: success()
+        run: '[ -z "$HC_PING" ] || curl -fsS -m 15 --retry 3 "$HC_PING" >/dev/null || true'
+      - name: Ping failure
+        # Inline, not ping.sh: a rollback runs an older sil_common that may not have it.
+        # Not being signed in today is not an alert (deploy.sh and terraform.sh leave the marker).
+        if: failure()
+        run: |
+          [ -n "$HC_PING" ] || exit 0
+          [ -f "$RUNNER_TEMP/sil-not-signed-in" ] && exit 0
+          curl -fsS -m 15 --retry 3 "$HC_PING/fail" >/dev/null || true
       - name: Remove ciFiles
         if: always()
         run: bash sil_common/tool/ci/files.sh "$NAME" clean

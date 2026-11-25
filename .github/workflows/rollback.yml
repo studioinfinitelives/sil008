@@ -21,6 +21,7 @@ permissions:
 jobs:
   rollback:
     runs-on: [self-hosted, home-mac]
+    timeout-minutes: 45
     concurrency:
       group: deploy-${{ github.repository }}-prod
       cancel-in-progress: false
@@ -57,6 +58,17 @@ jobs:
         run: bash sil_common/tool/ci/smoke.sh "$NAME" prod
       - name: Record the deploy
         run: bash sil_common/tool/ci/record.sh "$NAME" prod success
+      - name: Ping success
+        if: success()
+        run: '[ -z "$HC_PING" ] || curl -fsS -m 15 --retry 3 "$HC_PING" >/dev/null || true'
+      - name: Ping failure
+        # Inline, not ping.sh: a rollback runs an older sil_common that may not have it.
+        # Not being signed in today is not an alert (deploy.sh and terraform.sh leave the marker).
+        if: failure()
+        run: |
+          [ -n "$HC_PING" ] || exit 0
+          [ -f "$RUNNER_TEMP/sil-not-signed-in" ] && exit 0
+          curl -fsS -m 15 --retry 3 "$HC_PING/fail" >/dev/null || true
       - name: Remove ciFiles
         if: always()
         run: bash sil_common/tool/ci/files.sh "$NAME" clean

@@ -38,6 +38,7 @@ permissions:
 jobs:
   terraform:
     runs-on: [self-hosted, home-mac]
+    timeout-minutes: 45
     concurrency:
       group: terraform-${{ github.repository }}-${{ inputs.env }}
       cancel-in-progress: false
@@ -46,6 +47,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
       TF_ENV: ${{ inputs.env }}
+      HC_PING: ${{ inputs.env == 'prod' && secrets.HC_PING_PROD || secrets.HC_PING_DEV }}
       ALLOW_DELETE: ${{ inputs.allow_delete }}
       CONFIRM: ${{ inputs.confirm }}
       WANTED_SHA: ${{ inputs.sha }}
@@ -85,6 +87,13 @@ jobs:
             echo "Plan deletes resources. Run again with allow_delete and confirm set to $NAME." >&2
           fi
           exit $code
+      - name: Ping failure
+        # Not being signed in today is not an alert (terraform.sh leaves the marker).
+        if: failure()
+        run: |
+          [ -n "$HC_PING" ] || exit 0
+          [ -f "$RUNNER_TEMP/sil-not-signed-in" ] && exit 0
+          curl -fsS -m 15 --retry 3 "$HC_PING/fail" >/dev/null || true
       - name: Remove ciFiles
         if: always()
         run: bash sil_common/tool/ci/files.sh "$NAME" clean
