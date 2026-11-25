@@ -1,5 +1,5 @@
 {
-  "common": "v0.1.6",
+  "common": "v0.1.9",
   "legal": { "surface": "site", "privacyPage": "src/app/privacy/page.tsx" },
   "dev": {},
   "releaseNotes": "src/content/release_notes.json",

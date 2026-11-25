@@ -27,6 +27,7 @@ jobs:
       cancel-in-progress: true
     outputs:
       deploy_dev: ${{ steps.plan.outputs.deploy_dev }}
+      terraform_dev: ${{ steps.plan.outputs.terraform_dev }}
     env:
       NAME: ${{ github.event.repository.name }}
       GH_TOKEN: ${{ github.token }}
@@ -62,13 +63,52 @@ jobs:
             deploy=true
           fi
           echo "deploy_dev=$deploy" >> "$GITHUB_OUTPUT"
+          # Terraform runs only when this push touched infra/ (a new or unreachable BEFORE counts as touched).
+          terraform=false
+          if [ "$deploy" = true ] && [ -f "$NAME/infra/terraform/envs/dev.tfvars" ]; then
+            if ! git -C "$NAME" diff --quiet "$BEFORE" "$SHA" -- infra 2>/dev/null; then terraform=true; fi
+          fi
+          echo "terraform_dev=$terraform" >> "$GITHUB_OUTPUT"
+      - name: Remove ciFiles
+        if: always()
+        run: bash sil_common/tool/ci/files.sh "$NAME" clean
+
+  terraform-dev:
+    needs: checks
+    if: needs.checks.outputs.terraform_dev == 'true'
+    runs-on: [self-hosted, home-mac]
+    concurrency:
+      group: terraform-${{ github.repository }}-dev
+      cancel-in-progress: false
+    env:
+      NAME: ${{ github.event.repository.name }}
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          path: ${{ github.event.repository.name }}
+          clean: true
+          fetch-depth: 0
+      - name: Fetch sil_common at the pinned tag
+        run: |
+          common="$(jq -r .common "$NAME/sil.json")"
+          rm -rf sil_common
+          git clone --depth 1 --branch "$common" git@github.com:studioinfinitelives/sil_common.git sil_common
+      - name: Copy ciFiles
+        run: |
+          bash sil_common/tool/ci/setup.sh "$NAME"
+          bash sil_common/tool/ci/files.sh "$NAME" copy
+      - name: Apply Terraform to dev
+        run: bash sil_common/tool/ci/terraform.sh "$NAME" dev apply --allow-delete
       - name: Remove ciFiles
         if: always()
         run: bash sil_common/tool/ci/files.sh "$NAME" clean
 
   deploy-dev:
-    needs: checks
-    if: needs.checks.outputs.deploy_dev == 'true'
+    needs: [checks, terraform-dev]
+    if: ${{ !cancelled() && needs.checks.result == 'success' && needs.checks.outputs.deploy_dev == 'true' && needs.terraform-dev.result != 'failure' }}
     runs-on: [self-hosted, home-mac]
     concurrency:
       group: deploy-${{ github.repository }}-dev

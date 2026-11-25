@@ -1,0 +1,99 @@
+# Monday 14:20 UTC the weekly update (pin and dependencies, pushes dev), 15:20 UTC the read-only health check.
+# Run by hand from the Actions tab: both jobs, update first. Schedules are staggered 10 minutes per project (one runner).
+# INLINE COPY of sil_common/.github/workflows/update.yml and weekly.yml: a public repo cannot call a private
+# repo's reusable workflow. Keep the steps in step with those files.
+# Never add a pull_request trigger: this runs on a self-hosted machine (make doctor enforces it).
+name: scheduled
+
+on:
+  schedule:
+    - cron: "20 14 * * 1"
+    - cron: "20 15 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  update:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '20 14 * * 1'
+    runs-on: [self-hosted, home-mac]
+    concurrency:
+      group: scheduled-${{ github.repository }}-update
+      cancel-in-progress: false
+    env:
+      NAME: ${{ github.event.repository.name }}
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      HC_PING: ${{ secrets.HC_PING_WEEKLY }}
+      SUMMARY_FILE: ${{ runner.temp }}/update-summary.txt
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          path: ${{ github.event.repository.name }}
+          ref: dev
+          clean: true
+          fetch-depth: 0
+      - name: Fetch sil_common at its latest tag
+        run: |
+          tag="$(git ls-remote --tags --refs git@github.com:studioinfinitelives/sil_common.git 'v*' | sed 's|.*refs/tags/||' | sort -V | tail -n 1)"
+          [ -n "$tag" ] || { echo "no v* tag found on sil_common" >&2; exit 1; }
+          rm -rf sil_common
+          git clone --depth 1 --branch "$tag" git@github.com:studioinfinitelives/sil_common.git sil_common
+      - name: Update
+        # A hung flutter or npm has blocked the one runner before: fail instead.
+        timeout-minutes: 45
+        run: bash sil_common/tool/ci/update.sh "$NAME"
+      - name: Ping on failure
+        if: failure() || cancelled()
+        run: |
+          [ -s "$SUMMARY_FILE" ] || echo "update failed or timed out before writing a summary; see the run log" > "$SUMMARY_FILE"
+          bash sil_common/tool/ci/ping.sh fail "$SUMMARY_FILE"
+      - name: Remove ciFiles
+        if: always()
+        run: bash sil_common/tool/ci/files.sh "$NAME" clean
+
+  weekly:
+    needs: update
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || github.event.schedule == '20 15 * * 1') }}
+    runs-on: [self-hosted, home-mac]
+    concurrency:
+      group: scheduled-${{ github.repository }}-weekly
+      cancel-in-progress: false
+    env:
+      NAME: ${{ github.event.repository.name }}
+      HC_PING: ${{ secrets.HC_PING_WEEKLY }}
+      SUMMARY_FILE: ${{ runner.temp }}/weekly-summary.txt
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          path: ${{ github.event.repository.name }}
+          clean: true
+          fetch-depth: 0
+      - name: Fetch sil_common at the pinned tag
+        run: |
+          common="$(jq -r .common "$NAME/sil.json")"
+          rm -rf sil_common
+          git clone --depth 1 --branch "$common" git@github.com:studioinfinitelives/sil_common.git sil_common
+      - name: Health check
+        # A hung flutter or npm has blocked the one runner before: fail instead.
+        timeout-minutes: 30
+        run: bash sil_common/tool/ci/weekly.sh "$NAME"
+      - name: Upload Lighthouse reports
+        if: always()
+        # Not pinned to a commit: pin it with the other actions.
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: lighthouse
+          path: ${{ github.event.repository.name }}/.lighthouseci
+          if-no-files-found: ignore
+      - name: Ping
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = success ]; then
+            bash sil_common/tool/ci/ping.sh ok "$SUMMARY_FILE"
+          else
+            [ -s "$SUMMARY_FILE" ] || echo "weekly check failed or timed out before writing a summary; see the run log" > "$SUMMARY_FILE"
+            bash sil_common/tool/ci/ping.sh fail "$SUMMARY_FILE"
+          fi

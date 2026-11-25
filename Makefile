@@ -38,7 +38,7 @@ build: ## Clean static export (no deploy)
 
 # Puts the same build on a temporary channel: always the last step before a DNS change (see README).
 preview-prod: build ## Build + deploy to the prod preview channel (7d)
-	firebase hosting:channel:deploy preview --only prod --expires 7d
+	GOOGLE_CLOUD_QUOTA_PROJECT=sil008 firebase hosting:channel:deploy preview --only prod --expires 7d
 
 ### CDN
 # Publish this site's art to the sil-studio-art Hosting site (cdn.infinitelives.io)
@@ -63,7 +63,7 @@ pull-cdn: ## Fetch manifest-listed files missing from cdn/
 deploy-cdn: pull-cdn test ## Pull, test, record manifest, publish cdn/ art
 	$(CDN_SYNC) record --cdn-dir cdn --manifest cdn.manifest
 	npx vitest run src/lib/cdn.test.ts
-	firebase deploy --only hosting:sil-studio-art -P cdn --config firebase.cdn.json
+	GOOGLE_CLOUD_QUOTA_PROJECT=sil-cdn-fa1a1 firebase deploy --only hosting:sil-studio-art -P cdn --config firebase.cdn.json
 	$(RECORD_CDN_DEPLOY) prod
 	@git diff --quiet -- cdn.manifest || echo "cdn.manifest changed -- commit it"
 

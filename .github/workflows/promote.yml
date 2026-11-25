@@ -59,6 +59,20 @@ jobs:
         run: |
           bash sil_common/tool/ci/setup.sh "$NAME"
           bash sil_common/tool/ci/files.sh "$NAME" copy
+      - name: Apply Terraform to prod
+        run: |
+          [ -f "$NAME/infra/terraform/envs/prod.tfvars" ] || exit 0
+          last="$(git -C "$NAME" describe --tags --abbrev=0 --match 'v*' "$SHA" 2>/dev/null || true)"
+          if [ -n "$last" ] && git -C "$NAME" diff --quiet "$last" "$SHA" -- infra; then
+            echo "infra/ unchanged since $last: no Terraform apply"
+            exit 0
+          fi
+          bash sil_common/tool/ci/terraform.sh "$NAME" prod apply && exit 0
+          code=$?
+          if [ $code -eq 3 ]; then
+            echo "Plan deletes resources. Run the Terraform workflow with allow_delete, then /prod again." >&2
+          fi
+          exit $code
       - name: Deploy to prod
         run: bash sil_common/tool/ci/deploy.sh "$NAME" prod
       - name: Smoke test

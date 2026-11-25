@@ -1,0 +1,90 @@
+# Plans and applies Terraform for one environment, by hand. The logic is sil_common's tool/ci/ at the tag in sil.json.
+# INLINE COPY of sil_common/.github/workflows/terraform.yml: a public repo cannot call a private repo's
+# reusable workflow. Keep the steps in step with that file.
+# Deletions need allow_delete and confirm set to the repo name.
+# Never add a pull_request trigger (self-hosted runner; make doctor enforces it).
+name: terraform
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Environment
+        required: true
+        default: dev
+        type: choice
+        options: [dev, prod]
+      sha:
+        description: Commit to apply (default the dev head)
+        required: false
+        default: ""
+        type: string
+      allow_delete:
+        description: Allow the plan to delete or replace resources
+        required: false
+        default: false
+        type: boolean
+      confirm:
+        description: With allow_delete, the repo name
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+  deployments: write
+  statuses: write
+
+jobs:
+  terraform:
+    runs-on: [self-hosted, home-mac]
+    concurrency:
+      group: terraform-${{ github.repository }}-${{ inputs.env }}
+      cancel-in-progress: false
+    env:
+      NAME: ${{ github.event.repository.name }}
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      TF_ENV: ${{ inputs.env }}
+      ALLOW_DELETE: ${{ inputs.allow_delete }}
+      CONFIRM: ${{ inputs.confirm }}
+      WANTED_SHA: ${{ inputs.sha }}
+    steps:
+      - name: Check the inputs
+        run: |
+          case "$TF_ENV" in dev|prod) ;; *) echo "env must be dev or prod" >&2; exit 1 ;; esac
+          if [ "$ALLOW_DELETE" = true ] && [ "$CONFIRM" != "$NAME" ]; then
+            echo "allow_delete needs confirm set to the repo name: $NAME" >&2
+            exit 1
+          fi
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          path: ${{ github.event.repository.name }}
+          ref: ${{ inputs.sha || 'dev' }}
+          clean: true
+          fetch-depth: 0
+      - name: Fetch sil_common at the pinned tag
+        run: |
+          common="$(jq -r .common "$NAME/sil.json")"
+          rm -rf sil_common
+          git clone --depth 1 --branch "$common" git@github.com:studioinfinitelives/sil_common.git sil_common
+      - name: Copy ciFiles
+        run: |
+          bash sil_common/tool/ci/setup.sh "$NAME"
+          bash sil_common/tool/ci/files.sh "$NAME" copy
+      - name: Plan
+        run: bash sil_common/tool/ci/terraform.sh "$NAME" "$TF_ENV" plan
+      - name: Apply
+        run: |
+          export SHA="$(git -C "$NAME" rev-parse HEAD)"
+          flag=""
+          [ "$ALLOW_DELETE" = true ] && flag="--allow-delete"
+          bash sil_common/tool/ci/terraform.sh "$NAME" "$TF_ENV" apply $flag && exit 0
+          code=$?
+          if [ $code -eq 3 ]; then
+            echo "Plan deletes resources. Run again with allow_delete and confirm set to $NAME." >&2
+          fi
+          exit $code
+      - name: Remove ciFiles
+        if: always()
+        run: bash sil_common/tool/ci/files.sh "$NAME" clean

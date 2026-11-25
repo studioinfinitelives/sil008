@@ -60,3 +60,6 @@ next-env.d.ts
 # `make local` links cdn/ here so local dev can show unpublished art
 # (../sil_common/make/cdn.mk). NEVER COMMIT IT, for the same reason as cdn/.
 /public/_cdn
+
+# Lighthouse reports from the weekly check (tool/ci/lighthouse.sh).
+/.lighthouseci/
